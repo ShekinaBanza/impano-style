@@ -322,7 +322,7 @@ f().onsubmit = (e) => {
   if (cur) Object.assign(cur, data, { sizes: data.sizes, soldout: data.soldout, hidden: data.hidden });
   else {
     const slug = data.name.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "article";
-    list.unshift({ id: slug + "-" + Math.random().toString(36).slice(2, 6), ...data });
+    list.unshift({ id: slug + "-" + Math.random().toString(36).slice(2, 6), ...data, added: Date.now() });
   }
   if (!persist()) return;
   closeForm(); drawList(); say(cur ? "Article mis à jour ✦" : "Article ajouté ✦");

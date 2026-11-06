@@ -242,7 +242,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Carrousel nouveautés (les 8 premières pièces visibles, les plus récentes d'abord)
   const picks = ["bonnet-pourpre-cowrie", "ensemble-cascade", "sac-papillon", "bonnet-emeraude", "ensemble-ivoire", "chapeau-wosoko", "sac-lune", "gilet-soleil"].map(byId).filter((p) => p && !p.hidden);
-  const list = picks.length >= 4 ? picks : PRODUCTS.slice(0, 8);
+  const fresh = PRODUCTS.filter((p) => p.added).sort((a, b) => b.added - a.added);   // articles ajoutés depuis l'admin : toujours en tête
+  const base = picks.length >= 4 ? picks : PRODUCTS.slice(0, 8);
+  const list = [...fresh, ...base.filter((p) => !fresh.includes(p))].slice(0, 12);
   $("#rail").innerHTML = list.map((p) => productCard(p, "snap-start shrink-0 w-[72vw] sm:w-[40vw] lg:w-[23%]")).join("");
   const step = () => $("#rail").clientWidth * 0.6;
   $("#next").onclick = () => $("#rail").scrollBy({ left: step(), behavior: "smooth" });
