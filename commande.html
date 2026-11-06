@@ -2,6 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
+  <script>(function(){var r="/";if(/\.github\.io$/.test(location.hostname))r="/"+location.pathname.split("/")[1]+"/";window.ROOT=r;document.write('<base href="'+r+'">')})()</script>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <script>try{if(localStorage.getItem("impano_theme")==="dark")document.documentElement.classList.add("dark")}catch(e){}</script>
   <link rel="manifest" href="manifest.webmanifest">
@@ -23,14 +24,14 @@
 
 <main class="pt-[8.5rem] pb-24">
   <div class="max-w-[1300px] mx-auto px-5 md:px-10">
-    <p class="eyebrow text-terra mb-4"><a href="boutique.html" class="ulink">← Continuer mes achats</a></p>
+    <p class="eyebrow text-terra mb-4"><a href="boutique" class="ulink">← Continuer mes achats</a></p>
     <h1 class="display text-6xl md:text-8xl italic mb-14">Ma commande</h1>
 
     <!-- Panier vide -->
     <div id="empty" class="hidden text-center py-24">
       <svg class="w-10 h-14 mx-auto mb-6 text-terra"><use href="#cowrie"/></svg>
       <p class="display text-4xl mb-4">Votre panier est vide</p>
-      <a href="boutique.html" class="btn btn-ink mt-6">Découvrir la boutique</a>
+      <a href="boutique" class="btn btn-ink mt-6">Découvrir la boutique</a>
     </div>
 
     <form id="form" class="hidden grid lg:grid-cols-12 gap-14 lg:gap-20" novalidate>
@@ -95,7 +96,7 @@
       <p class="opacity-75 leading-relaxed mb-10">Dernière étape : envoyez-nous le récapitulatif sur WhatsApp pour que nous confirmions la disponibilité et le paiement.</p>
       <div class="flex flex-col sm:flex-row gap-4 justify-center">
         <a id="d-wa" target="_blank" rel="noopener" class="btn btn-ink">Envoyer sur WhatsApp</a>
-        <a href="boutique.html" class="btn btn-ghost">Retour à la boutique</a>
+        <a href="boutique" class="btn btn-ghost">Retour à la boutique</a>
       </div>
     </div>
   </div>

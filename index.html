@@ -2,6 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
+  <script>(function(){var r="/";if(/\.github\.io$/.test(location.hostname))r="/"+location.pathname.split("/")[1]+"/";window.ROOT=r;document.write('<base href="'+r+'">')})()</script>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <script>try{if(localStorage.getItem("impano_theme")==="dark")document.documentElement.classList.add("dark")}catch(e){}</script>
   <link rel="manifest" href="manifest.webmanifest">
@@ -21,7 +22,7 @@
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body data-hero>
-<a href="#main" class="skip">Aller au contenu</a>
+<a href="javascript:void(0)" onclick="document.getElementById('main').scrollIntoView();document.getElementById('main').focus()" class="skip">Aller au contenu</a>
 
 <!-- ================= HERO ================= -->
 <section id="main" class="relative h-[calc(100svh-34px)] min-h-[620px] bg-ink text-cowrie overflow-hidden">
@@ -33,8 +34,8 @@
     <p class="logo-tag text-[.62rem] md:text-sm mt-6 md:mt-9 opacity-90" data-cms="home.hero.tag" data-cms-label="Hero › Slogan">Wear the gift &nbsp;·&nbsp; Be the gift</p>
     <p class="max-w-md mt-8 text-base md:text-lg font-light leading-snug opacity-85" data-cms="home.hero.lead" data-cms-label="Hero › Texte d’intro">Du crochet fait main à Lubumbashi. Chaque pièce est unique, comme celui ou celle qui la porte.</p>
     <div class="mt-10 flex flex-wrap justify-center gap-4">
-      <a href="boutique.html" class="btn btn-light"><span data-cms="home.hero.cta1" data-cms-label="Hero › Bouton 1">Découvrir la collection</span> <svg class="w-6 h-3"><use href="#arrow"/></svg></a>
-      <a href="histoire.html" class="btn btn-light border-cowrie/40"><span data-cms="home.hero.cta2" data-cms-label="Hero › Bouton 2">Notre histoire</span></a>
+      <a href="boutique" class="btn btn-light"><span data-cms="home.hero.cta1" data-cms-label="Hero › Bouton 1">Découvrir la collection</span> <svg class="w-6 h-3"><use href="#arrow"/></svg></a>
+      <a href="histoire" class="btn btn-light border-cowrie/40"><span data-cms="home.hero.cta2" data-cms-label="Hero › Bouton 2">Notre histoire</span></a>
     </div>
   </div>
   <p class="absolute bottom-6 inset-x-0 text-center eyebrow !text-[.58rem] opacity-60" data-cms="home.hero.foot" data-cms-label="Hero › Ligne du bas">Crochet d’auteur · Lubumbashi · RD Congo</p>
@@ -55,7 +56,7 @@
     <p class="max-w-sm opacity-70 leading-relaxed" data-cms="home.cats.text" data-cms-label="Catégories › Texte">Du bonnet qui couronne au sac qui accompagne, jusqu’à la robe qui sculpte la lumière : trois univers, une même main.</p>
   </div>
   <div class="grid md:grid-cols-3 gap-4 md:gap-6">
-    <a href="boutique.html?cat=bonnets" class="group relative block aspect-[3/4] overflow-hidden bg-ink reveal">
+    <a href="boutique/bonnets" class="group relative block aspect-[3/4] overflow-hidden bg-ink reveal">
       <img data-cms-img="cat.bonnets.img" data-cms-label="Catégorie Bonnets › Photo" src="assets/img/p32.jpg" alt="Bonnets et chapeaux" class="zoom absolute inset-0 w-full h-full object-cover" loading="lazy">
       <div class="absolute inset-0 bg-gradient-to-t from-ink/80 via-transparent to-transparent"></div>
       <div class="absolute inset-0 frame opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
@@ -66,7 +67,7 @@
         <span class="eyebrow inline-flex items-center gap-3">Explorer <svg class="w-6 h-3 group-hover:translate-x-2 transition-transform"><use href="#arrow"/></svg></span>
       </div>
     </a>
-    <a href="boutique.html?cat=sacs" class="group relative block aspect-[3/4] overflow-hidden bg-ink reveal reveal-d1">
+    <a href="boutique/sacs" class="group relative block aspect-[3/4] overflow-hidden bg-ink reveal reveal-d1">
       <img data-cms-img="cat.sacs.img" data-cms-label="Catégorie Sacs › Photo" src="assets/img/p20.jpg" alt="Sacs bananes" class="zoom absolute inset-0 w-full h-full object-cover" loading="lazy">
       <div class="absolute inset-0 bg-gradient-to-t from-ink/80 via-transparent to-transparent"></div>
       <div class="absolute inset-0 frame opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
@@ -77,7 +78,7 @@
         <span class="eyebrow inline-flex items-center gap-3">Explorer <svg class="w-6 h-3 group-hover:translate-x-2 transition-transform"><use href="#arrow"/></svg></span>
       </div>
     </a>
-    <a href="boutique.html?cat=pret-a-porter" class="group relative block aspect-[3/4] overflow-hidden bg-ink reveal reveal-d2">
+    <a href="boutique/pret-a-porter" class="group relative block aspect-[3/4] overflow-hidden bg-ink reveal reveal-d2">
       <img data-cms-img="cat.pret-a-porter.img" data-cms-label="Catégorie Prêt-à-porter › Photo" src="assets/img/p07.jpg" alt="Prêt-à-porter crochet" class="zoom absolute inset-0 w-full h-full object-cover" loading="lazy">
       <div class="absolute inset-0 bg-gradient-to-t from-ink/80 via-transparent to-transparent"></div>
       <div class="absolute inset-0 frame opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
@@ -105,7 +106,7 @@
       </div>
     </div>
     <div id="rail" class="no-bar flex gap-5 md:gap-7 overflow-x-auto snap-x snap-mandatory -mx-5 px-5 md:mx-0 md:px-0 pb-4"></div>
-    <div class="text-center mt-12"><a href="boutique.html" class="btn btn-ghost">Voir toute la boutique</a></div>
+    <div class="text-center mt-12"><a href="boutique" class="btn btn-ghost">Voir toute la boutique</a></div>
   </div>
 </section>
 
@@ -121,7 +122,7 @@
       <p class="eyebrow mb-6 opacity-70" data-cms="home.promise.eyebrow" data-cms-label="Notre promesse › Sur-titre">01 — Notre promesse</p>
       <h2 class="display text-5xl md:text-7xl mb-8" data-cms="home.promise.title" data-cms-label="Notre promesse › Titre">Un seul<br><span class="italic">exemplaire.</span></h2>
       <p class="text-lg font-light leading-relaxed opacity-85 mb-10" data-cms="home.promise.text" data-cms-label="Notre promesse › Texte">Chaque bonnet, chaque sac, chaque ensemble est crocheté à la main, motif après motif, et ne sera plus jamais repris. Quand une pièce part, c’est qu’elle a trouvé la personne qui devait la porter.</p>
-      <a href="boutique.html" class="btn btn-light" data-cms="home.promise.cta" data-cms-label="Notre promesse › Bouton">Voir les pièces disponibles</a>
+      <a href="boutique" class="btn btn-light" data-cms="home.promise.cta" data-cms-label="Notre promesse › Bouton">Voir les pièces disponibles</a>
     </div>
   </div>
 </section>
@@ -136,7 +137,7 @@
       <h2 class="display text-5xl md:text-7xl mb-8" data-cms="home.cauri.title" data-cms-label="Cauris › Titre">Le langage<br><span class="italic">des cauris</span></h2>
       <p class="text-lg font-light leading-relaxed opacity-90 mb-6" data-cms="home.cauri.p1" data-cms-label="Cauris › Paragraphe 1">Avant d’être des bijoux, ils étaient de la monnaie. En Afrique subsaharienne, le cauri est le symbole de la prospérité, de la richesse matérielle, de la fertilité, de la féminité — et une puissante protection contre le mauvais œil.</p>
       <p class="text-lg font-light leading-relaxed opacity-90 mb-10" data-cms="home.cauri.p2" data-cms-label="Cauris › Paragraphe 2">C’est pourquoi nous le cousons sur nos pièces : un détail minuscule, une histoire immense.</p>
-      <a href="histoire.html#cauris" class="btn btn-light" data-cms="home.cauri.cta" data-cms-label="Cauris › Bouton">Lire l’histoire</a>
+      <a href="histoire#cauris" class="btn btn-light" data-cms="home.cauri.cta" data-cms-label="Cauris › Bouton">Lire l’histoire</a>
     </div>
     <div class="lg:col-span-7 grid grid-cols-2 gap-4 md:gap-6">
       <div class="mt-12 reveal reveal-d1"><div class="overflow-hidden aspect-[3/4]"><img data-cms-img="home.cauri.img1" data-cms-label="Cauris › Photo 1" src="assets/img/p32.jpg" alt="Bonnet violet orné d’un cauri" class="w-full h-full object-cover" loading="lazy"></div></div>
@@ -185,7 +186,7 @@
     <div class="lg:col-span-7 order-1 lg:order-2 lg:pl-16 reveal reveal-d1">
       <p class="eyebrow opacity-60 mb-8" data-cms="home.quote.eyebrow" data-cms-label="Citation › Sur-titre">04 — L’atelier</p>
       <blockquote class="display text-4xl md:text-6xl italic leading-[1.05]" data-cms="home.quote.text" data-cms-label="Citation › Texte">« Impano veut dire le don. Ce que nous créons, nous l’offrons — à celle ou celui qui le portera. »</blockquote>
-      <a href="histoire.html" class="btn btn-light mt-12" data-cms="home.quote.cta" data-cms-label="Citation › Bouton">Entrer dans la maison</a>
+      <a href="histoire" class="btn btn-light mt-12" data-cms="home.quote.cta" data-cms-label="Citation › Bouton">Entrer dans la maison</a>
     </div>
   </div>
 </section>

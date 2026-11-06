@@ -30,14 +30,14 @@
           <div><svg class="w-10 h-14 mx-auto mb-6 text-terra"><use href="#cowrie"/></svg>
           <p class="display text-3xl mb-3">Votre panier est vide</p>
           <p class="text-sm opacity-60 mb-8">Chaque pièce attend sa propre histoire.</p>
-          <a href="boutique.html" class="btn btn-ink">Voir la boutique</a></div></div>`;
+          <a href="boutique" class="btn btn-ink">Voir la boutique</a></div></div>`;
         $("#cart-foot").classList.add("hidden"); return;
       }
       $("#cart-foot").classList.remove("hidden");
       list.innerHTML = this.items.map((it, i) => {
         const p = byId(it.id);
         return `<div class="flex gap-5 py-6 border-b border-ink/10">
-          <a href="produit.html?id=${p.id}" class="w-24 h-32 shrink-0 overflow-hidden bg-bone"><img src="${p.img}" alt="${p.name}" class="w-full h-full object-cover"></a>
+          <a href="produit/${p.id}" class="w-24 h-32 shrink-0 overflow-hidden bg-bone"><img src="${p.img}" alt="${p.name}" class="w-full h-full object-cover"></a>
           <div class="flex-1 flex flex-col">
             <div class="flex justify-between gap-3"><h4 class="display text-xl leading-tight">${p.name}</h4><span class="text-sm">${fmt(p.price * it.qty)}</span></div>
             <p class="text-xs opacity-60 mt-1">${p.color}${it.size ? " · Taille " + it.size : ""}</p>
@@ -70,7 +70,7 @@
   window.productCard = function (p, extra = "") {
     const second = p.gallery[1];
     return `<article class="group relative ${extra}">
-      <a href="produit.html?id=${p.id}" class="block relative overflow-hidden bg-bone aspect-[4/5]">
+      <a href="produit/${p.id}" class="block relative overflow-hidden bg-bone aspect-[4/5]">
         <img src="${p.img}" alt="${p.name}" loading="lazy" class="zoom absolute inset-0 w-full h-full object-cover">
         ${second ? `<img src="${second}" alt="" loading="lazy" class="absolute inset-0 w-full h-full object-cover opacity-0 group-hover:opacity-100 transition-opacity duration-700">` : ""}
         <span class="absolute top-4 left-4 eyebrow bg-ivory/90 text-ink px-3 py-1.5 !text-[.58rem]">${p.soldout ? "Épuisé" : p.tag}</span>
@@ -78,7 +78,7 @@
       <button data-fav="${p.id}" class="fav absolute top-3 right-3 z-10 w-10 h-10 grid place-items-center bg-ivory/90 rounded-full ${Fav.has(p.id) ? "on" : ""}" aria-label="Ajouter aux favoris" aria-pressed="${Fav.has(p.id)}"><svg class="w-5 h-5"><use href="#heart"/></svg></button>
       ${p.soldout ? "" : `<button data-quick="${p.id}" class="absolute left-3 right-3 bottom-[5.6rem] btn btn-ink !py-3 translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 max-md:hidden">${p.sizes ? "Choisir la taille" : "Ajouter au panier"}</button>`}
       <div class="pt-5 flex justify-between gap-4">
-        <div><h3 class="display text-2xl leading-none"><a href="produit.html?id=${p.id}" class="ulink">${p.name}</a></h3>
+        <div><h3 class="display text-2xl leading-none"><a href="produit/${p.id}" class="ulink">${p.name}</a></h3>
         <p class="text-xs opacity-55 mt-2 tracking-wide">${p.color}</p></div>
         <p class="text-sm pt-1">${fmt(p.price)}</p>
       </div></article>`;
@@ -86,7 +86,7 @@
   document.addEventListener("click", (e) => {
     const q = e.target.closest("[data-quick]"); if (!q) return;
     const p = byId(q.dataset.quick);
-    if (p.sizes) location.href = "produit.html?id=" + p.id; else { Cart.add(p.id); openCart(); }
+    if (p.sizes) location.href = "produit/" + p.id; else { Cart.add(p.id); openCart(); }
   });
 
   /* ---------- CHROME : annonce, en-tête, menu, panier, pied de page ---------- */
@@ -103,16 +103,16 @@
   </defs></svg>`;
 
   const NAV = [
-    ["boutique.html", "Boutique"],
-    ["boutique.html?cat=bonnets", "Bonnets"],
-    ["boutique.html?cat=sacs", "Sacs"],
-    ["boutique.html?cat=pret-a-porter", "Prêt-à-porter"],
-    ["histoire.html", "La Maison"]
+    ["boutique", "Boutique"],
+    ["boutique/bonnets", "Bonnets"],
+    ["boutique/sacs", "Sacs"],
+    ["boutique/pret-a-porter", "Prêt-à-porter"],
+    ["histoire", "La Maison"]
   ];
 
   function chrome() {
     const onHero = document.body.hasAttribute("data-hero");
-    const cur = location.pathname.split("/").pop() + location.search;
+    const cur = location.pathname.slice((window.ROOT || "/").length).replace(/\/+$/, "").replace(/\.html$/, "");
     document.body.insertAdjacentHTML("afterbegin", sprite + `
     <div class="bg-ink text-ivory text-center py-2.5 eyebrow !text-[.62rem] !tracking-[.3em] relative z-[60]" data-cms="global.announce">
       Chaque pièce est faite main &nbsp;✦&nbsp; Livraison offerte dès ${fmt(CONFIG.freeShippingFrom)}
@@ -123,12 +123,12 @@
           ${NAV.slice(0, 4).map(([h, l]) => `<a href="${h}" class="ulink ${cur === h ? "active" : ""}">${l}</a>`).join("")}
         </nav>
         <button id="burger" class="lg:hidden justify-self-start eyebrow flex items-center gap-3" aria-label="Menu"><span class="block w-6 h-px bg-current relative before:absolute before:-top-1.5 before:w-6 before:h-px before:bg-current after:absolute after:top-1.5 after:w-4 after:h-px after:bg-current"></span></button>
-        <a href="index.html" class="hlogo justify-self-center text-center leading-none" aria-label="Impano — accueil">
+        <a href="./" class="hlogo justify-self-center text-center leading-none" aria-label="Impano — accueil">
           <span class="logo text-[2.1rem] md:text-[2.6rem] block">impano</span>
           <span class="logo-tag block text-[.45rem] mt-1.5 opacity-70">Wear the gift · Be the gift</span>
         </a>
         <div class="justify-self-end flex items-center gap-4 md:gap-6 eyebrow">
-          <a href="histoire.html" class="hidden lg:inline ulink">La Maison</a>
+          <a href="histoire" class="hidden lg:inline ulink">La Maison</a>
           <button id="theme-toggle" class="flex items-center" aria-label="Changer de thème (clair / sombre)" title="Mode sombre"><svg class="w-[22px] h-[22px] theme-moon"><use href="#moon"/></svg><svg class="w-[22px] h-[22px] theme-sun"><use href="#sun"/></svg></button>
           <button id="open-search" class="flex items-center gap-2" aria-label="Rechercher"><svg class="w-[22px] h-[22px]"><use href="#search"/></svg></button>
           <button id="open-acct" class="flex items-center gap-2" aria-label="Se connecter"><svg class="w-[22px] h-[22px]"><use href="#user"/></svg><span id="acct-label" class="hidden lg:inline">Se connecter</span></button>
@@ -146,7 +146,7 @@
       <aside class="drawer absolute left-0 top-0 h-full w-[88%] max-w-md bg-ivory -translate-x-full p-8 flex flex-col">
         <button id="close-menu" class="self-end eyebrow mb-10">Fermer ✕</button>
         <nav class="flex flex-col gap-6">
-          ${[["index.html", "Accueil"], ...NAV].map(([h, l]) => `<a href="${h}" class="display text-5xl italic">${l}</a>`).join("")}
+          ${[["./", "Accueil"], ...NAV].map(([h, l]) => `<a href="${h}" class="display text-5xl italic">${l}</a>`).join("")}
         </nav>
         <button id="menu-acct" class="eyebrow ulink self-start mt-10">Se connecter / Mon compte</button>
         <div class="mt-auto pt-10 text-sm opacity-60">Lubumbashi · RD Congo<br>Wear the Gift · Be the Gift</div>
@@ -165,7 +165,7 @@
           <div class="h-px bg-ink/15 mb-3 relative"><div id="cart-bar" class="absolute inset-y-0 left-0 bg-terra h-[3px] -top-px transition-all duration-700"></div></div>
           <p id="cart-ship" class="text-xs opacity-70 mb-5"></p>
           <div class="flex justify-between items-end mb-5"><span class="eyebrow">Sous-total</span><span id="cart-sub" class="display text-3xl"></span></div>
-          <a href="commande.html" class="btn btn-ink w-full">Commander</a>
+          <a href="commande" class="btn btn-ink w-full">Commander</a>
           <p class="text-[.7rem] opacity-55 text-center mt-3">Frais de livraison calculés à l’étape suivante</p>
         </div>
       </aside>
@@ -183,9 +183,9 @@
             <p class="mt-8 max-w-sm opacity-70 leading-relaxed" data-cms="global.footer.blurb">« Impano » signifie <em>le don</em>. Chaque fil que nous nouons est un cadeau — pour celui qui le crée, pour celui qui le porte.</p>
           </div>
           <div class="lg:col-span-2 lg:col-start-7"><p class="eyebrow opacity-50 mb-6">Boutique</p><ul class="space-y-3 text-sm">
-            <li><a class="ulink" href="boutique.html?cat=bonnets">Bonnets & Chapeaux</a></li><li><a class="ulink" href="boutique.html?cat=sacs">Sacs bananes</a></li><li><a class="ulink" href="boutique.html?cat=pret-a-porter">Prêt-à-porter</a></li><li><a class="ulink" href="boutique.html">Tout voir</a></li></ul></div>
+            <li><a class="ulink" href="boutique/bonnets">Bonnets & Chapeaux</a></li><li><a class="ulink" href="boutique/sacs">Sacs bananes</a></li><li><a class="ulink" href="boutique/pret-a-porter">Prêt-à-porter</a></li><li><a class="ulink" href="boutique">Tout voir</a></li></ul></div>
           <div class="lg:col-span-2"><p class="eyebrow opacity-50 mb-6">Maison</p><ul class="space-y-3 text-sm">
-            <li><a class="ulink" href="histoire.html">Notre histoire</a></li><li><a class="ulink" href="histoire.html#cauris">Le langage des cauris</a></li><li><a class="ulink" href="histoire.html#atelier">L’atelier</a></li><li><a class="ulink" href="commande.html">Ma commande</a></li><li><a class="ulink" href="admin.html">Espace admin</a></li></ul></div>
+            <li><a class="ulink" href="histoire">Notre histoire</a></li><li><a class="ulink" href="histoire#cauris">Le langage des cauris</a></li><li><a class="ulink" href="histoire#atelier">L’atelier</a></li><li><a class="ulink" href="commande">Ma commande</a></li><li><a class="ulink" href="admin">Espace admin</a></li></ul></div>
           <div class="lg:col-span-2"><p class="eyebrow opacity-50 mb-6">Service</p><ul class="space-y-3 text-sm opacity-90">
             <li>Paiement Mobile Money</li><li>Paiement à la livraison</li><li>Commande sur WhatsApp</li><li>Retrait à l’atelier</li><li><button class="ulink opacity-100" onclick="installApp()">📲 Installer l’app</button></li></ul></div>
         </div>
@@ -303,7 +303,7 @@
         <p class="text-sm opacity-60 mb-8">${escH(u.email)}${u.phone ? " · " + escH(u.phone) : ""}</p>
         <h3 class="eyebrow mb-4">Mes commandes</h3>
         <div class="space-y-3 mb-8 max-h-56 overflow-y-auto">${os.map((o) => `<div class="flex justify-between border-b border-ink/10 pb-3 text-sm"><span><b class="font-medium">${escH(o.ref)}</b><br><span class="opacity-55 text-xs">${new Date(o.date).toLocaleDateString("fr-FR")} · ${o.items.reduce((n, i) => n + i.qty, 0)} article(s)</span></span><span>${fmt(o.total)}</span></div>`).join("") || '<p class="text-sm opacity-55">Aucune commande pour le moment.</p>'}</div>
-        <div class="flex gap-3 flex-wrap"><a href="boutique.html" class="btn btn-ink !py-3">Continuer mes achats</a><button id="acct-out" class="btn btn-ghost !py-3">Se déconnecter</button></div>`;
+        <div class="flex gap-3 flex-wrap"><a href="boutique" class="btn btn-ink !py-3">Continuer mes achats</a><button id="acct-out" class="btn btn-ghost !py-3">Se déconnecter</button></div>`;
       $("#acct-out").onclick = () => { Account.logout(); acctButton(); acctView("login"); toast("À bientôt ✦"); document.dispatchEvent(new CustomEvent("accountchange")); };
       return;
     }
@@ -320,7 +320,7 @@
         <button class="btn btn-ink w-full">${signup ? "Créer mon compte" : "Se connecter"}</button>
       </form>
       <p class="text-sm text-center mt-6 opacity-80">${signup ? "Déjà un compte ?" : "Pas encore de compte ?"} <button id="acct-switch" class="ulink text-terra">${signup ? "Se connecter" : "Créer un compte"}</button></p>
-      <p class="text-[.7rem] text-center mt-6 opacity-45">Votre compte est enregistré sur cet appareil. · <a href="admin.html" class="ulink">Espace administrateur</a></p>`;
+      <p class="text-[.7rem] text-center mt-6 opacity-45">Votre compte est enregistré sur cet appareil. · <a href="admin" class="ulink">Espace administrateur</a></p>`;
     $("#acct-switch").onclick = () => acctView(signup ? "login" : "signup");
     $("#acct-form").onsubmit = async (e) => {
       e.preventDefault(); const f = e.target, err = $("#acct-err");
@@ -347,14 +347,14 @@
       const toks = q.split(/\s+/);
       const res = PRODUCTS.filter((p) => { const h = norm([p.name, p.color, p.desc, p.tag, (CATEGORIES.find((c) => c.id === p.cat) || {}).label].join(" ")); return toks.every((t) => h.includes(t)); }).slice(0, 8);
       out.innerHTML = res.length
-        ? `<div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">${res.map((p) => `<a href="produit.html?id=${p.id}" class="group block"><div class="aspect-[4/5] overflow-hidden bg-bone"><img src="${p.img}" alt="" class="zoom w-full h-full object-cover"></div><p class="display text-xl mt-3 leading-tight">${escH(p.name)}</p><p class="text-sm opacity-60">${fmt(p.price)}</p></a>`).join("")}</div>`
-        : `<p class="opacity-70">Aucun résultat pour « ${escH(inp.value)} ». <a class="ulink text-terra" href="boutique.html">Voir toute la boutique</a></p>`;
+        ? `<div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">${res.map((p) => `<a href="produit/${p.id}" class="group block"><div class="aspect-[4/5] overflow-hidden bg-bone"><img src="${p.img}" alt="" class="zoom w-full h-full object-cover"></div><p class="display text-xl mt-3 leading-tight">${escH(p.name)}</p><p class="text-sm opacity-60">${fmt(p.price)}</p></a>`).join("")}</div>`
+        : `<p class="opacity-70">Aucun résultat pour « ${escH(inp.value)} ». <a class="ulink text-terra" href="boutique">Voir toute la boutique</a></p>`;
     };
     const close = () => { sr.classList.add("hidden"); document.body.style.overflow = ""; };
     window.openSearch = () => { sr.classList.remove("hidden"); document.body.style.overflow = "hidden"; inp.value = ""; run(); setTimeout(() => inp.focus(), 50); };
     window.closeSearch = close;
     inp.oninput = run; $("#search-x").onclick = close; $("#search-ov").onclick = close;
-    $("#search-chips").innerHTML = CATEGORIES.map((c) => `<a href="boutique.html?cat=${c.id}" class="eyebrow border border-ink/25 px-4 py-2 hover:bg-ink hover:text-ivory transition">${escH(c.short)}</a>`).join("");
+    $("#search-chips").innerHTML = CATEGORIES.map((c) => `<a href="boutique/${c.id}" class="eyebrow border border-ink/25 px-4 py-2 hover:bg-ink hover:text-ivory transition">${escH(c.short)}</a>`).join("");
   }
 
   function setTheme(t) {

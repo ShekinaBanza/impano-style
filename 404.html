@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Impano</title>
+<script>
+/* GitHub Pages n'a pas de « réécriture » : les adresses propres /produit/<id> et /boutique/<categorie>
+   arrivent ici, puis on redirige vers la bonne page (qui remet l'adresse propre). */
+(function () {
+  var r = "/", p = location.pathname;
+  if (/\.github\.io$/.test(location.hostname)) r = "/" + p.split("/")[1] + "/";
+  var seg = p.slice(r.length).split("/").filter(Boolean), to = r;
+  if (seg[0] === "produit" && seg[1]) to = r + "produit.html?id=" + encodeURIComponent(seg[1]);
+  else if (seg[0] === "boutique" && seg[1]) to = r + "boutique.html?cat=" + encodeURIComponent(seg[1]);
+  location.replace(to);
+})();
+</script></head>
+<body style="background:#15110E;color:#F7F2E9;font-family:sans-serif;display:grid;place-items:center;height:100vh;margin:0"><p>Redirection…</p></body></html>

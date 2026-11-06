@@ -2,6 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
+  <script>(function(){var r="/";if(/\.github\.io$/.test(location.hostname))r="/"+location.pathname.split("/")[1]+"/";window.ROOT=r;document.write('<base href="'+r+'">')})()</script>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <script>try{if(localStorage.getItem("impano_theme")==="dark")document.documentElement.classList.add("dark")}catch(e){}</script>
   <link rel="manifest" href="manifest.webmanifest">
@@ -23,7 +24,7 @@
 
 <main class="pt-[8.5rem]">
   <section class="max-w-[1500px] mx-auto px-5 md:px-10 pb-10">
-    <p class="eyebrow text-terra mb-4"><a href="index.html" class="ulink">Accueil</a> &nbsp;/&nbsp; Boutique</p>
+    <p class="eyebrow text-terra mb-4"><a href="./" class="ulink">Accueil</a> &nbsp;/&nbsp; Boutique</p>
     <h1 id="title" class="display text-6xl md:text-8xl italic">La boutique</h1>
     <p id="blurb" class="mt-6 max-w-xl opacity-70 leading-relaxed">Toutes nos pièces sont crochetées à la main à Lubumbashi. Quand une pièce unique est partie, elle ne revient pas.</p>
   </section>
@@ -64,8 +65,12 @@
 <script src="js/app.js"></script>
 <script>
 document.addEventListener("DOMContentLoaded", () => {
-  const params = new URLSearchParams(location.search);
-  let cat = params.get("cat") || "all", sort = "def";
+  // URL propre : /boutique, /boutique/sacs (ancien format ?cat=sacs toujours accepté)
+  const segs = location.pathname.slice(ROOT.length).replace(/\.html$/, "").split("/").filter(Boolean);
+  let cat = segs[1] || new URLSearchParams(location.search).get("cat") || "all", sort = "def";
+  if (cat !== "all" && cat !== "fav" && !CATEGORIES.some((c) => c.id === cat)) cat = "all";
+  const clean = () => history.replaceState(null, "", cat === "all" ? "boutique" : "boutique/" + cat);
+  clean();
   let avail = false;
   const filters = () => [{ id: "all", label: "Tout" }, ...CATEGORIES.map((c) => ({ id: c.id, label: c.short })), { id: "fav", label: `♥ Favoris${Fav.ids.length ? " (" + Fav.ids.length + ")" : ""}` }];
   $("#wa").href = `https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent("Bonjour Impano, j’aimerais une création sur mesure.")}`;
@@ -84,9 +89,9 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   $("#filters").addEventListener("click", (e) => {
     const b = e.target.closest("[data-f]"); if (!b) return;
-    cat = b.dataset.f; history.replaceState(null, "", cat === "all" ? "boutique.html" : "?cat=" + cat); draw();
+    cat = b.dataset.f; clean(); draw();
   });
-  $("#grid").addEventListener("click", (e) => { const b = e.target.closest("[data-f]"); if (b) { cat = "all"; history.replaceState(null, "", "boutique.html"); draw(); }
+  $("#grid").addEventListener("click", (e) => { const b = e.target.closest("[data-f]"); if (b) { cat = "all"; clean(); draw(); }
   });
   document.addEventListener("favchange", () => { if (cat === "fav") draw(); else $("#filters").innerHTML = filters().map((f) => `<button data-f="${f.id}" class="ulink ${cat === f.id ? "active" : "opacity-55"}">${f.label}</button>`).join(""); });
   $("#avail").onchange = (e) => { avail = e.target.checked; draw(); };

@@ -2,6 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
+  <script>(function(){var r="/";if(/\.github\.io$/.test(location.hostname))r="/"+location.pathname.split("/")[1]+"/";window.ROOT=r;document.write('<base href="'+r+'">')})()</script>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <script>try{if(localStorage.getItem("impano_theme")==="dark")document.documentElement.classList.add("dark")}catch(e){}</script>
   <link rel="manifest" href="manifest.webmanifest">
@@ -27,7 +28,7 @@
   <section class="max-w-[1500px] mx-auto px-5 md:px-10 py-24">
     <div class="flex items-end justify-between mb-12">
       <h2 class="display text-5xl md:text-6xl">Vous aimerez <span class="italic">aussi</span></h2>
-      <a href="boutique.html" class="eyebrow ulink hidden sm:inline">Tout voir</a>
+      <a href="boutique" class="eyebrow ulink hidden sm:inline">Tout voir</a>
     </div>
     <div id="more" class="grid grid-cols-2 lg:grid-cols-4 gap-x-4 md:gap-x-7 gap-y-12"></div>
   </section>
@@ -39,14 +40,17 @@
 <script src="js/app.js"></script>
 <script>
 document.addEventListener("DOMContentLoaded", () => {
-  const p = byId(new URLSearchParams(location.search).get("id"));
-  if (!p) { location.replace("boutique.html"); return; }
+  // URL propre : /produit/<id> (ancien format ?id=<id> toujours accepté)
+  const segs = location.pathname.slice(ROOT.length).replace(/\.html$/, "").split("/").filter(Boolean);
+  const p = byId(segs[1] || new URLSearchParams(location.search).get("id"));
+  if (!p) { location.replace("boutique"); return; }
+  history.replaceState(null, "", "produit/" + p.id);
   document.title = p.name + " — Impano";
   const cat = CATEGORIES.find((c) => c.id === p.cat);
   let size = null, qty = 1, cur = 0;
 
   $("#pdp").innerHTML = `
-  <p class="eyebrow text-terra mb-8"><a href="index.html" class="ulink">Accueil</a> / <a href="boutique.html?cat=${cat.id}" class="ulink">${cat.short}</a> / ${p.name}</p>
+  <p class="eyebrow text-terra mb-8"><a href="./" class="ulink">Accueil</a> / <a href="boutique/${cat.id}" class="ulink">${cat.short}</a> / ${p.name}</p>
   <div class="grid lg:grid-cols-12 gap-10 lg:gap-16">
     <div class="lg:col-span-7 grid grid-cols-[4.5rem_1fr] gap-4 items-start">
       <div id="thumbs" class="flex flex-col gap-3">
@@ -105,7 +109,7 @@ document.addEventListener("DOMContentLoaded", () => {
   $("#plus").onclick = () => { qty = Math.min(10, qty + 1); $("#qty").textContent = qty; };
   const ok = () => { if (p.sizes && !size) { $("#size-err").classList.remove("hidden"); sz.scrollIntoView({ block: "center", behavior: "smooth" }); return false; } return true; };
   if ($("#add")) { $("#add").onclick = () => { if (ok()) { Cart.add(p.id, size, qty); openCart(); } };
-  $("#buy").onclick = () => { if (ok()) { Cart.add(p.id, size, qty); location.href = "commande.html"; } }; }
+  $("#buy").onclick = () => { if (ok()) { Cart.add(p.id, size, qty); location.href = "commande"; } }; }
 
   // Barre d'achat collante (mobile)
   if (!p.soldout) {

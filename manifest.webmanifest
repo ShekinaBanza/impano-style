@@ -3,7 +3,7 @@
   "short_name": "Impano",
   "description": "Crochet fait main à Lubumbashi : bonnets, sacs bananes et prêt-à-porter. Commandez en ligne.",
   "lang": "fr",
-  "start_url": "./index.html",
+  "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
@@ -15,7 +15,7 @@
     { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ],
   "shortcuts": [
-    { "name": "Boutique", "url": "boutique.html" },
-    { "name": "Mon panier", "url": "commande.html" }
+    { "name": "Boutique", "url": "boutique" },
+    { "name": "Mon panier", "url": "commande" }
   ]
 }
