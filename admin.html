@@ -222,6 +222,11 @@ const CAT = Object.fromEntries(CATEGORIES.map((c) => [c.id, c.short]));
 
 function init() {
   $("#m-title"); $("[name=cat]").innerHTML = CATEGORIES.map((c) => `<option value="${c.id}">${c.label}</option>`).join("");
+  if (!localStorage.getItem("impano_merged_n1") && localStorage.getItem("impano_products")) {
+    const have = new Set(list.map((p) => p.id)), add = DEFAULT_PRODUCTS.filter((p) => p.added && !have.has(p.id));
+    if (add.length) { list.unshift(...add.map((p) => JSON.parse(JSON.stringify(p)))); persist(); }
+  }
+  localStorage.setItem("impano_merged_n1", "1");
   syncPublished(); drawList(); drawOrders(); fillSettings(); drawDirty();
   $$(".tab").forEach((b) => b.onclick = () => {
     $$(".tab").forEach((x) => x.classList.toggle("on", x === b));
@@ -412,7 +417,17 @@ $("#reset").onclick = () => { if (confirm("Rétablir le catalogue d’origine ? 
 const GH_KEY = "impano_gh";
 const gh = () => ({ owner: "ShekinaBanza", repo: "impano-style", branch: "main", token: "", ...(JSON.parse(localStorage.getItem(GH_KEY) || "{}")) });
 const isDirty = () => localStorage.getItem("impano_dirty") === "1";
-function markDirty() { localStorage.setItem("impano_dirty", "1"); drawDirty(); }
+let autoT = null, autoBusy = false;
+function markDirty() { localStorage.setItem("impano_dirty", "1"); drawDirty(); if (window.sb) { clearTimeout(autoT); autoT = setTimeout(autoPublish, 1500); } }
+/* Avec Supabase : chaque modification est enregistrée en ligne automatiquement (plus besoin de cliquer sur Publier) */
+async function autoPublish() {
+  if (autoBusy) { autoT = setTimeout(autoPublish, 1500); return; }
+  if (!isDirty()) return;
+  autoBusy = true; const lg = [];
+  try { say("Enregistrement en ligne…"); await publishSB((m) => lg.push(m)); say("En ligne ✦ visible sur tous les appareils"); drawList(); drawDirty(); }
+  catch (e) { console.error(e); alert("⚠ Enregistrement en ligne impossible : " + e.message + " — Vérifiez que vous êtes connecté avec le compte administrateur et que schema.sql + make_admin ont été exécutés dans Supabase."); }
+  finally { autoBusy = false; }
+}
 function drawDirty() {
   const d = $("#dirty"); if (d) d.classList.toggle("hidden", !isDirty());
   if ($("#pub-state")) drawPublish();
