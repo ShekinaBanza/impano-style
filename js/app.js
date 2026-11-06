@@ -331,7 +331,8 @@
         <p class="text-sm opacity-60 mb-8">${escH(u.email)}${u.phone ? " · " + escH(u.phone) : ""}</p>
         <h3 class="eyebrow mb-4">Mes commandes</h3>
         <div id="acct-orders" class="space-y-3 mb-8 max-h-56 overflow-y-auto"><p class="text-sm opacity-55">Chargement…</p></div>
-        <div class="flex gap-3 flex-wrap"><a href="boutique" class="btn btn-ink !py-3">Continuer mes achats</a><button id="acct-out" class="btn btn-ghost !py-3">Se déconnecter</button></div>`;
+        <div class="flex gap-3 flex-wrap"><a id="acct-admin" href="admin" class="btn btn-ink !py-3 hidden">Espace administrateur</a><a href="boutique" class="btn btn-ink !py-3">Continuer mes achats</a><button id="acct-out" class="btn btn-ghost !py-3">Se déconnecter</button></div>`;
+      if (window.sb) sb.rpc("is_admin").then(({ data }) => { if (data === true) $("#acct-admin")?.classList.remove("hidden"); });
       $("#acct-out").onclick = async () => { await Account.logout(); acctButton(); acctView("login"); toast("À bientôt ✦"); document.dispatchEvent(new CustomEvent("accountchange")); };
       Promise.resolve(Account.orders()).then((os) => {
         const box2 = $("#acct-orders"); if (!box2) return;
@@ -352,7 +353,7 @@
         <button class="btn btn-ink w-full">${signup ? "Créer mon compte" : "Se connecter"}</button>
       </form>
       <p class="text-sm text-center mt-6 opacity-80">${signup ? "Déjà un compte ?" : "Pas encore de compte ?"} <button id="acct-switch" class="ulink text-terra">${signup ? "Se connecter" : "Créer un compte"}</button></p>
-      <p class="text-[.7rem] text-center mt-6 opacity-45">Votre compte est enregistré sur cet appareil. · <a href="admin" class="ulink">Espace administrateur</a></p>`;
+      <p class="text-[.7rem] text-center mt-6 opacity-45">${window.sb ? "Connexion sécurisée." : "Votre compte est enregistré sur cet appareil."} · <a href="admin" class="ulink">Espace administrateur</a></p>`;
     $("#acct-switch").onclick = () => acctView(signup ? "login" : "signup");
     $("#acct-form").onsubmit = async (e) => {
       e.preventDefault(); const f = e.target, err = $("#acct-err");
@@ -361,7 +362,10 @@
         if (!f.email.value.includes("@")) throw new Error("Email invalide.");
         if (f.password.value.length < 6) throw new Error("Mot de passe : 6 caractères minimum.");
         if (signup) await Account.signup({ name: f.name.value, email: f.email.value, phone: f.phone.value, password: f.password.value });
-        else await Account.login(f.email.value, f.password.value);
+        else {
+          await Account.login(f.email.value, f.password.value);
+          if (window.sb && (await sb.rpc("is_admin")).data === true) { toast("Bienvenue, administrateur ✦"); setTimeout(() => (location.href = "admin"), 500); return; }
+        }
         acctButton(); acctView(); toast("Connecté ✦"); document.dispatchEvent(new CustomEvent("accountchange"));
       } catch (er) { if (er.message === "CONFIRM") { box.innerHTML = `<p class="eyebrow text-terra mb-3">Presque fini</p><h2 class="display text-4xl italic mb-4">Vérifiez vos mails</h2><p class="opacity-70 leading-relaxed">Nous avons envoyé un lien de confirmation à votre adresse. Cliquez dessus, puis revenez vous connecter.</p>`; } else err.textContent = er.message; }
     };
