@@ -30,15 +30,17 @@
   </section>
 
   <!-- Filtres -->
-  <div class="sticky top-20 z-30 bg-ivory/95 backdrop-blur border-y border-ink/10">
-    <div class="max-w-[1500px] mx-auto px-5 md:px-10 h-16 flex items-center justify-between gap-6">
-      <div id="filters" class="flex gap-7 overflow-x-auto no-bar eyebrow whitespace-nowrap"></div>
-      <div class="flex items-center gap-3 shrink-0">
-        <label class="hidden md:flex items-center gap-2 eyebrow cursor-pointer"><input id="avail" type="checkbox" class="accent-[#B4521E]"> Disponibles</label>
-        <span id="count" class="eyebrow opacity-50 hidden sm:inline"></span>
-        <select id="sort" class="bg-transparent eyebrow border-0 outline-none cursor-pointer">
-          <option value="def">Sélection</option><option value="asc">Prix croissant</option><option value="desc">Prix décroissant</option>
-        </select>
+  <div class="fbar">
+    <div class="fbar-in">
+      <div id="filters" class="chips" role="tablist" aria-label="Catégories"></div>
+      <div class="fctl">
+        <label class="switch"><input id="avail" type="checkbox"><span class="tr"></span>Disponibles</label>
+        <div class="flex items-center gap-4">
+          <span id="count" class="fcount hidden sm:inline"></span>
+          <select id="sort" class="sortsel" aria-label="Trier">
+            <option value="def">Sélection</option><option value="asc">Prix croissant</option><option value="desc">Prix décroissant</option>
+          </select>
+        </div>
       </div>
     </div>
   </div>
@@ -74,18 +76,21 @@ document.addEventListener("DOMContentLoaded", () => {
   const clean = () => history.replaceState(null, "", cat === "all" ? "boutique" : "boutique/" + cat);
   clean();
   let avail = false;
-  const filters = () => [{ id: "all", label: "Tout" }, ...CATEGORIES.map((c) => ({ id: c.id, label: c.short })), { id: "fav", label: `♥ Favoris${Fav.ids.length ? " (" + Fav.ids.length + ")" : ""}` }];
+  const counts = (id) => id === "all" ? PRODUCTS.length : id === "fav" ? PRODUCTS.filter((p) => Fav.has(p.id)).length : PRODUCTS.filter((p) => p.cat === id).length;
+  const filters = () => [{ id: "all", label: "Tout" }, ...CATEGORIES.map((c) => ({ id: c.id, label: c.short })), { id: "fav", label: "Favoris", heart: true }];
+  const chips = () => filters().map((f) => `<button role="tab" aria-selected="${cat === f.id}" data-f="${f.id}" class="chip ${f.heart ? "heart" : ""} ${cat === f.id ? "on" : ""}">${f.heart ? '<svg><use href="#heart"/></svg>' : ""}${f.label}<span class="n">${counts(f.id)}</span></button>`).join("");
   $("#wa").href = `https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent("Bonjour Impano, j’aimerais une création sur mesure.")}`;
 
   function draw() {
-    $("#filters").innerHTML = filters().map((f) => `<button data-f="${f.id}" class="ulink ${cat === f.id ? "active" : "opacity-55"}">${f.label}</button>`).join("");
+    $("#filters").innerHTML = chips();
+    const on = $("#filters .on"), fb = $("#filters"); if (on) fb.scrollLeft = on.offsetLeft - (fb.clientWidth - on.offsetWidth) / 2;
     let list = PRODUCTS.filter((p) => (cat === "all" || (cat === "fav" ? Fav.has(p.id) : p.cat === cat)) && (!avail || !p.soldout));
     if (sort === "asc") list = [...list].sort((a, b) => a.price - b.price);
     if (sort === "desc") list = [...list].sort((a, b) => b.price - a.price);
     const c = CATEGORIES.find((x) => x.id === cat);
     $("#title").textContent = c ? c.label : cat === "fav" ? "Mes favoris" : "La boutique";
     $("#blurb").textContent = c ? c.blurb + " Fait main, pièces limitées." : cat === "fav" ? "Les pièces que vous avez aimées, gardées au chaud sur cet appareil." : "Toutes nos pièces sont crochetées à la main à Lubumbashi. Quand une pièce unique est partie, elle ne revient pas.";
-    $("#count").textContent = list.length + " pièces";
+    $("#count").textContent = list.length + (list.length > 1 ? " pièces" : " pièce");
     $("#grid").innerHTML = list.length ? list.map((p, i) => productCard(p, `reveal reveal-d${i % 4}`)).join("") : `<div class="col-span-full text-center py-24"><svg class="w-8 h-12 mx-auto mb-5 text-terra"><use href="#cowrie"/></svg><p class="display text-4xl mb-3">${cat === "fav" ? "Aucun favori pour l’instant" : "Aucune pièce ici"}</p><p class="opacity-60 mb-8">${cat === "fav" ? "Touchez le cœur sur une pièce pour la retrouver ici." : "Essayez un autre filtre."}</p><button data-f="all" class="btn btn-ink">Voir toute la boutique</button></div>`;
     watchReveal();
   }
@@ -95,7 +100,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
   $("#grid").addEventListener("click", (e) => { const b = e.target.closest("[data-f]"); if (b) { cat = "all"; clean(); draw(); }
   });
-  document.addEventListener("favchange", () => { if (cat === "fav") draw(); else $("#filters").innerHTML = filters().map((f) => `<button data-f="${f.id}" class="ulink ${cat === f.id ? "active" : "opacity-55"}">${f.label}</button>`).join(""); });
+  document.addEventListener("favchange", () => { if (cat === "fav") draw(); else $("#filters").innerHTML = chips(); });
   $("#avail").onchange = (e) => { avail = e.target.checked; draw(); };
   $("#sort").onchange = (e) => { sort = e.target.value; draw(); };
   draw();

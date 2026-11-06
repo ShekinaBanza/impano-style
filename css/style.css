@@ -160,3 +160,33 @@ html.dark .skip { background: #F1E9DC; color: #14100D; }
 html.dark #install-card { background: #1E1812; }
 html.dark .bg-ink.text-cowrie, html.dark footer { border-top: 1px solid rgba(241,233,220,.06); }
 html.dark img, html.dark video { filter: brightness(.94); }
+
+/* ================= BARRE DE FILTRES (boutique) ================= */
+.fbar { position: sticky; top: 4.25rem; z-index: 30; background: rgba(247,242,233,.94); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(21,17,14,.1); }
+.fbar-in { max-width: 1500px; margin: 0 auto; padding: .85rem 1.25rem; display: flex; flex-direction: column; gap: .75rem; }
+@media (min-width: 768px) { .fbar-in { padding: .9rem 2.5rem; flex-direction: row; align-items: center; justify-content: space-between; gap: 1.5rem; } }
+.chips { display: flex; gap: .5rem; overflow-x: auto; scrollbar-width: none; -webkit-mask-image: linear-gradient(90deg, #000 92%, transparent); mask-image: linear-gradient(90deg, #000 92%, transparent); padding-right: 1.5rem; }
+@media (min-width: 768px) { .chips { -webkit-mask-image: none; mask-image: none; padding-right: 0; } }
+.chips::-webkit-scrollbar { display: none; }
+.chip { flex: none; display: inline-flex; align-items: center; gap: .45rem; height: 2.5rem; padding: 0 1.1rem; border: 1px solid rgba(21,17,14,.22); border-radius: 999px; font-size: .68rem; letter-spacing: .16em; text-transform: uppercase; white-space: nowrap; transition: all .25s; }
+.chip:hover { border-color: #15110E; }
+.chip .n { font-size: .62rem; letter-spacing: 0; opacity: .5; }
+.chip.on { background: #15110E; color: #F7F2E9; border-color: #15110E; }
+.chip.on .n { opacity: .7; }
+.chip.heart svg { width: .85rem; height: .85rem; }
+.fctl { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex: none; }
+.switch { display: inline-flex; align-items: center; gap: .6rem; cursor: pointer; font-size: .66rem; letter-spacing: .16em; text-transform: uppercase; user-select: none; }
+.switch input { position: absolute; opacity: 0; pointer-events: none; }
+.switch .tr { width: 2.3rem; height: 1.3rem; border-radius: 999px; background: rgba(21,17,14,.2); position: relative; transition: background .25s; flex: none; }
+.switch .tr::after { content: ""; position: absolute; top: .15rem; left: .15rem; width: 1rem; height: 1rem; border-radius: 50%; background: #fff; transition: transform .25s; box-shadow: 0 1px 3px rgba(0,0,0,.3); }
+.switch input:checked + .tr { background: #B4521E; }
+.switch input:checked + .tr::after { transform: translateX(1rem); }
+.switch input:focus-visible + .tr { outline: 2px solid #B4521E; outline-offset: 2px; }
+.sortsel { appearance: none; -webkit-appearance: none; border: 1px solid rgba(21,17,14,.22); border-radius: 999px; height: 2.5rem; padding: 0 2.2rem 0 1rem; font-size: .66rem; letter-spacing: .14em; text-transform: uppercase; background: transparent url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none' stroke='%2315110E' stroke-width='1.4'%3E%3Cpath d='M1 1l4 4 4-4'/%3E%3C/svg%3E") no-repeat right .9rem center; cursor: pointer; }
+.fcount { font-size: .66rem; letter-spacing: .16em; text-transform: uppercase; opacity: .55; white-space: nowrap; }
+html.dark .fbar { background: rgba(20,16,13,.94); border-color: rgba(241,233,220,.12); }
+html.dark .chip, html.dark .sortsel { border-color: rgba(241,233,220,.25); }
+html.dark .chip:hover { border-color: #F1E9DC; }
+html.dark .chip.on { background: #F1E9DC; color: #14100D; border-color: #F1E9DC; }
+html.dark .switch .tr { background: rgba(241,233,220,.25); }
+html.dark .sortsel { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none' stroke='%23F1E9DC' stroke-width='1.4'%3E%3Cpath d='M1 1l4 4 4-4'/%3E%3C/svg%3E"); }
