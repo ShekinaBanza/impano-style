@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#15110E">
+  <link rel="icon" type="image/png" href="icons/favicon.png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Impano">
+  <title>Impano — Wear the Gift · Be the Gift | Crochet fait main, Lubumbashi</title>
+  <meta name="description" content="Impano : bonnets, sacs bananes et pièces crochet 100 % faits main à Lubumbashi. Pièces uniques, commande en ligne.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="js/tw-config.js"></script>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body data-hero>
+
+<!-- ================= HERO ================= -->
+<section class="relative h-[calc(100svh-34px)] min-h-[620px] bg-ink text-cowrie overflow-hidden">
+  <video class="absolute inset-0 w-full h-full object-cover opacity-90" src="assets/video/v12.mp4" poster="assets/img/p16.jpg" autoplay muted loop playsinline preload="auto"></video>
+  <div class="absolute inset-0 bg-gradient-to-t from-ink/85 via-ink/15 to-ink/45"></div>
+
+  <div class="relative h-full max-w-[1500px] mx-auto px-5 md:px-10 flex flex-col justify-end pb-14 md:pb-16">
+    <p class="eyebrow mb-6 flex items-center gap-4"><span class="w-12 h-px bg-cowrie/70"></span>Crochet d’auteur · Lubumbashi</p>
+    <h1 class="logo text-[clamp(5rem,20vw,19rem)] -ml-1 md:-ml-3">impano</h1>
+    <div class="mt-8 grid md:grid-cols-12 gap-8 items-end">
+      <p class="md:col-span-5 text-lg md:text-xl font-light leading-snug opacity-90 max-w-md">Wear the Gift, be the Gift. Des pièces tissées fil après fil, dont chacune n’existe qu’en un seul exemplaire.</p>
+      <div class="md:col-span-7 md:justify-self-end flex flex-wrap gap-4">
+        <a href="boutique.html" class="btn btn-light">Découvrir la collection <svg class="w-6 h-3"><use href="#arrow"/></svg></a>
+        <a href="histoire.html" class="btn btn-light border-cowrie/40">Notre histoire</a>
+      </div>
+    </div>
+  </div>
+  <div class="absolute right-6 md:right-10 top-1/2 hidden md:flex flex-col items-center gap-3 eyebrow !text-[.55rem] [writing-mode:vertical-rl] opacity-70">
+    Défiler <span class="w-px h-14 bg-cowrie/60 animate-floaty"></span>
+  </div>
+</section>
+
+<!-- ================= MARQUEE ================= -->
+<div class="bg-terra text-cowrie py-4 overflow-hidden border-y border-ink/20">
+  <div class="marquee-track animate-marquee">
+    <div class="flex shrink-0 items-center gap-10 pr-10 display italic text-2xl md:text-3xl whitespace-nowrap">
+      <span>Fait main</span><svg class="w-4 h-6"><use href="#cowrie"/></svg><span>Pièce unique</span><svg class="w-4 h-6"><use href="#cowrie"/></svg><span>Wear the Gift</span><svg class="w-4 h-6"><use href="#cowrie"/></svg><span>Slow fashion</span><svg class="w-4 h-6"><use href="#cowrie"/></svg><span>Be the Gift</span><svg class="w-4 h-6"><use href="#cowrie"/></svg><span>Crochet congolais</span><svg class="w-4 h-6"><use href="#cowrie"/></svg>
+    </div>
+    <div class="flex shrink-0 items-center gap-10 pr-10 display italic text-2xl md:text-3xl whitespace-nowrap" aria-hidden="true">
+      <span>Fait main</span><svg class="w-4 h-6"><use href="#cowrie"/></svg><span>Pièce unique</span><svg class="w-4 h-6"><use href="#cowrie"/></svg><span>Wear the Gift</span><svg class="w-4 h-6"><use href="#cowrie"/></svg><span>Slow fashion</span><svg class="w-4 h-6"><use href="#cowrie"/></svg><span>Be the Gift</span><svg class="w-4 h-6"><use href="#cowrie"/></svg><span>Crochet congolais</span><svg class="w-4 h-6"><use href="#cowrie"/></svg>
+    </div>
+  </div>
+</div>
+
+<!-- ================= CATÉGORIES ================= -->
+<section class="max-w-[1500px] mx-auto px-5 md:px-10 py-24 md:py-36">
+  <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-14 reveal">
+    <div>
+      <p class="eyebrow text-terra mb-4">Les trois maisons</p>
+      <h2 class="display text-5xl md:text-7xl">Choisissez<br><span class="italic">votre don</span></h2>
+    </div>
+    <p class="max-w-sm opacity-70 leading-relaxed">Du bonnet qui couronne au sac qui accompagne, jusqu’à la robe qui sculpte la lumière : trois univers, une même main.</p>
+  </div>
+  <div id="cats" class="grid md:grid-cols-3 gap-4 md:gap-6"></div>
+</section>
+
+<!-- ================= NOUVEAUTÉS (carrousel) ================= -->
+<section class="bg-bone py-24 md:py-32 overflow-hidden">
+  <div class="max-w-[1500px] mx-auto px-5 md:px-10">
+    <div class="flex items-end justify-between mb-12 reveal">
+      <div>
+        <p class="eyebrow text-terra mb-4">Nouvelle collection</p>
+        <h2 class="display text-5xl md:text-7xl">Pièces <span class="italic">uniques</span></h2>
+      </div>
+      <div class="hidden md:flex gap-3">
+        <button id="prev" class="w-14 h-14 border border-ink/30 grid place-items-center hover:bg-ink hover:text-ivory transition" aria-label="Précédent"><svg class="w-6 h-3 rotate-180"><use href="#arrow"/></svg></button>
+        <button id="next" class="w-14 h-14 border border-ink/30 grid place-items-center hover:bg-ink hover:text-ivory transition" aria-label="Suivant"><svg class="w-6 h-3"><use href="#arrow"/></svg></button>
+      </div>
+    </div>
+    <div id="rail" class="no-bar flex gap-5 md:gap-7 overflow-x-auto snap-x snap-mandatory -mx-5 px-5 md:mx-0 md:px-0 pb-4"></div>
+  </div>
+</section>
+
+<!-- ================= ÉDITORIAL VIDÉO ================= -->
+<section class="grid lg:grid-cols-2 min-h-[90vh]">
+  <div class="relative bg-ink min-h-[70vh] lg:min-h-0 overflow-hidden">
+    <video data-auto class="absolute inset-0 w-full h-full object-cover" src="assets/video/v26.mp4" poster="assets/img/p07.jpg" muted loop playsinline preload="metadata"></video>
+    <div class="absolute inset-0 frame"></div>
+  </div>
+  <div class="bg-moss text-cowrie flex items-center px-8 md:px-16 lg:px-24 py-20 relative overflow-hidden">
+    <div class="absolute inset-0 cowrie-pattern opacity-60"></div>
+    <div class="relative max-w-lg reveal">
+      <p class="eyebrow mb-6 opacity-70">01 — Notre promesse</p>
+      <h2 class="display text-5xl md:text-7xl mb-8">Un seul<br><span class="italic">exemplaire.</span></h2>
+      <p class="text-lg font-light leading-relaxed opacity-85 mb-10">Chaque bonnet, chaque sac, chaque ensemble est crocheté à la main, motif après motif, et ne sera plus jamais repris. Quand une pièce part, c’est qu’elle a trouvé la personne qui devait la porter.</p>
+      <a href="boutique.html" class="btn btn-light">Voir les pièces disponibles</a>
+    </div>
+  </div>
+</section>
+
+<!-- ================= LES CAURIS ================= -->
+<section class="bg-terra text-cowrie relative overflow-hidden py-24 md:py-36">
+  <div class="absolute inset-0 cowrie-pattern"></div>
+  <div class="relative max-w-[1500px] mx-auto px-5 md:px-10 grid lg:grid-cols-12 gap-14 items-center">
+    <div class="lg:col-span-5 reveal">
+      <svg class="w-14 h-20 mb-8"><use href="#cowrie"/></svg>
+      <p class="eyebrow mb-5 opacity-80">02 — Le savoir</p>
+      <h2 class="display text-5xl md:text-7xl mb-8">Le langage<br><span class="italic">des cauris</span></h2>
+      <p class="text-lg font-light leading-relaxed opacity-90 mb-6">Avant d’être des bijoux, ils étaient de la monnaie. En Afrique subsaharienne, le cauri est le symbole de la prospérité, de la richesse matérielle, de la fertilité, de la féminité — et une puissante protection contre le mauvais œil.</p>
+      <p class="text-lg font-light leading-relaxed opacity-90 mb-10">C’est pourquoi nous le cousons sur nos pièces : un détail minuscule, une histoire immense.</p>
+      <a href="histoire.html#cauris" class="btn btn-light">Lire l’histoire</a>
+    </div>
+    <div class="lg:col-span-7 grid grid-cols-2 gap-4 md:gap-6">
+      <div class="mt-12 reveal reveal-d1"><div class="overflow-hidden aspect-[3/4]"><img src="assets/img/p32.jpg" alt="Bonnet violet orné d’un cauri" class="w-full h-full object-cover" loading="lazy"></div></div>
+      <div class="reveal reveal-d2"><div class="overflow-hidden aspect-[3/4]"><img src="assets/img/p28.jpg" alt="Bob terre avec cauri" class="w-full h-full object-cover" loading="lazy"></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= LOOKBOOK VIDÉO ================= -->
+<section class="max-w-[1500px] mx-auto px-5 md:px-10 py-24 md:py-36">
+  <div class="text-center mb-16 reveal">
+    <p class="eyebrow text-terra mb-4">03 — Lookbook</p>
+    <h2 class="display text-5xl md:text-7xl">Sur le <span class="italic">podium</span> & dans la rue</h2>
+  </div>
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-5">
+    <button data-vid="assets/video/v24.mp4" class="vid-card group relative aspect-[9/16] overflow-hidden bg-ink text-left reveal">
+      <video data-auto class="absolute inset-0 w-full h-full object-cover" src="assets/video/v24.mp4" poster="assets/img/p05.jpg" muted loop playsinline preload="metadata"></video>
+      <div class="absolute inset-0 bg-gradient-to-t from-ink/80 to-transparent"></div>
+      <div class="absolute bottom-5 left-5 right-5 text-cowrie"><p class="eyebrow !text-[.58rem] opacity-70 mb-2">Défilé</p><p class="display text-2xl italic">Lubumbashi Fashion Week 2025</p></div>
+    </button>
+    <button data-vid="assets/video/v25.mp4" class="vid-card group relative aspect-[9/16] overflow-hidden bg-ink text-left reveal reveal-d1 lg:mt-14">
+      <video data-auto class="absolute inset-0 w-full h-full object-cover" src="assets/video/v25.mp4" muted loop playsinline preload="metadata"></video>
+      <div class="absolute inset-0 bg-gradient-to-t from-ink/80 to-transparent"></div>
+      <div class="absolute bottom-5 left-5 right-5 text-cowrie"><p class="eyebrow !text-[.58rem] opacity-70 mb-2">Modèle</p><p class="display text-2xl italic">Lydia en crochet</p></div>
+    </button>
+    <button data-vid="assets/video/v36.mp4" class="vid-card group relative aspect-[9/16] overflow-hidden bg-ink text-left reveal reveal-d2">
+      <video data-auto class="absolute inset-0 w-full h-full object-cover" src="assets/video/v36.mp4" poster="assets/img/p20.jpg" muted loop playsinline preload="metadata"></video>
+      <div class="absolute inset-0 bg-gradient-to-t from-ink/80 to-transparent"></div>
+      <div class="absolute bottom-5 left-5 right-5 text-cowrie"><p class="eyebrow !text-[.58rem] opacity-70 mb-2">Sacs bananes</p><p class="display text-2xl italic">Le sac qui te suit partout</p></div>
+    </button>
+    <button data-vid="assets/video/v37.mp4" class="vid-card group relative aspect-[9/16] overflow-hidden bg-ink text-left reveal reveal-d3 lg:mt-14">
+      <video data-auto class="absolute inset-0 w-full h-full object-cover" src="assets/video/v37.mp4" muted loop playsinline preload="metadata"></video>
+      <div class="absolute inset-0 bg-gradient-to-t from-ink/80 to-transparent"></div>
+      <div class="absolute bottom-5 left-5 right-5 text-cowrie"><p class="eyebrow !text-[.58rem] opacity-70 mb-2">Bientôt</p><p class="display text-2xl italic">La nouvelle collection</p></div>
+    </button>
+  </div>
+</section>
+
+<!-- ================= CITATION + ATELIER ================= -->
+<section class="bg-ink text-cowrie">
+  <div class="max-w-[1500px] mx-auto px-5 md:px-10 py-24 md:py-36 grid lg:grid-cols-12 gap-14 items-center">
+    <div class="lg:col-span-5 order-2 lg:order-1 relative reveal">
+      <img src="assets/img/p17.jpg" alt="L’atelier : fils, aiguilles et laine" class="w-full aspect-[4/5] object-cover grayscale" loading="lazy">
+      <div class="absolute -bottom-6 -right-2 md:-right-8 bg-terra px-6 py-5 display italic text-3xl">100 % main</div>
+    </div>
+    <div class="lg:col-span-7 order-1 lg:order-2 lg:pl-16 reveal reveal-d1">
+      <p class="eyebrow opacity-60 mb-8">04 — L’atelier</p>
+      <blockquote class="display text-4xl md:text-6xl italic leading-[1.05]">« Impano veut dire <span class="text-ember">le don</span>. Ce que nous créons, nous l’offrons — à celle ou celui qui le portera. »</blockquote>
+      <a href="histoire.html" class="btn btn-light mt-12">Entrer dans la maison</a>
+    </div>
+  </div>
+</section>
+
+<!-- ================= GALERIE DÉFILANTE ================= -->
+<section class="py-20 overflow-hidden bg-ivory">
+  <div class="marquee-track animate-marquee [animation-duration:60s]" id="gal"></div>
+</section>
+
+<!-- ================= NEWSLETTER ================= -->
+<section class="bg-bone py-24">
+  <div class="max-w-3xl mx-auto px-5 text-center reveal">
+    <svg class="w-8 h-12 mx-auto text-terra mb-6"><use href="#cowrie"/></svg>
+    <h2 class="display text-5xl md:text-6xl mb-5">Soyez prévenu <span class="italic">avant tous</span></h2>
+    <p class="opacity-70 mb-10">Les pièces uniques partent vite. Laissez-nous votre email, nous vous écrivons à chaque nouvelle collection.</p>
+    <form id="nl" class="flex flex-col sm:flex-row gap-4 max-w-xl mx-auto">
+      <input required type="email" placeholder="votre@email.com" class="field flex-1 text-center sm:text-left">
+      <button class="btn btn-ink">S’inscrire</button>
+    </form>
+  </div>
+</section>
+
+<div id="footer"></div>
+
+<!-- Lecteur vidéo plein écran -->
+<div id="player" class="fixed inset-0 z-[100] bg-ink/95 hidden items-center justify-center p-4">
+  <button id="player-x" class="absolute top-6 right-6 text-cowrie eyebrow">Fermer ✕</button>
+  <video id="player-v" class="max-h-[88vh] max-w-full" controls playsinline></video>
+</div>
+
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  // Catégories
+  $("#cats").innerHTML = CATEGORIES.map((c, i) => `
+    <a href="boutique.html?cat=${c.id}" class="group relative block aspect-[3/4] overflow-hidden bg-ink reveal reveal-d${i}">
+      <img src="${c.img}" alt="${c.label}" class="zoom absolute inset-0 w-full h-full object-cover" loading="lazy">
+      <div class="absolute inset-0 bg-gradient-to-t from-ink/80 via-transparent to-transparent"></div>
+      <div class="absolute inset-0 frame opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+      <div class="absolute bottom-0 inset-x-0 p-7 md:p-9 text-cowrie">
+        <p class="eyebrow !text-[.6rem] opacity-70 mb-3">0${i + 1}</p>
+        <h3 class="display text-4xl md:text-5xl italic mb-3">${c.label}</h3>
+        <p class="text-sm opacity-80 mb-5 max-w-[16rem]">${c.blurb}</p>
+        <span class="eyebrow inline-flex items-center gap-3">Explorer <svg class="w-6 h-3 group-hover:translate-x-2 transition-transform"><use href="#arrow"/></svg></span>
+      </div>
+    </a>`).join("");
+
+  // Carrousel nouveautés
+  const picks = ["bonnet-pourpre-cowrie", "ensemble-cascade", "sac-papillon", "bonnet-emeraude", "ensemble-ivoire", "chapeau-wosoko", "sac-lune", "gilet-soleil"].map(byId);
+  $("#rail").innerHTML = picks.map((p) => productCard(p, "snap-start shrink-0 w-[72vw] sm:w-[40vw] lg:w-[23%]")).join("");
+  const step = () => $("#rail").clientWidth * 0.6;
+  $("#next").onclick = () => $("#rail").scrollBy({ left: step(), behavior: "smooth" });
+  $("#prev").onclick = () => $("#rail").scrollBy({ left: -step(), behavior: "smooth" });
+
+  // Galerie
+  const gi = ["p01","p10","p27","p21","p06","p31","p03","p22","p09","p33c"];
+  const row = gi.map((n, i) => `<img src="assets/img/${n}.jpg" alt="" loading="lazy" class="h-72 md:h-96 w-auto object-cover mr-5 ${i % 2 ? "mt-8" : ""}">`).join("");
+  $("#gal").innerHTML = `<div class="flex shrink-0">${row}</div><div class="flex shrink-0" aria-hidden="true">${row}</div>`;
+
+  // Newsletter
+  $("#nl").onsubmit = (e) => { e.preventDefault(); e.target.reset(); toast("Merci ! Vous êtes sur la liste ✦"); };
+
+  // Lecteur vidéo
+  const pl = $("#player"), pv = $("#player-v");
+  $$("[data-vid]").forEach((b) => b.onclick = () => { pv.src = b.dataset.vid; pl.classList.replace("hidden", "flex"); pv.play(); document.body.style.overflow = "hidden"; });
+  const close = () => { pv.pause(); pl.classList.replace("flex", "hidden"); document.body.style.overflow = ""; };
+  $("#player-x").onclick = close; pl.onclick = (e) => { if (e.target === pl) close(); };
+  watchReveal();
+});
+</script>
+</body>
+</html>

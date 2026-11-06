@@ -1,0 +1,100 @@
+@import url("https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&display=swap");
+html { scroll-behavior: smooth; }
+body { font-family: "Jost", system-ui, sans-serif; background: #F7F2E9; color: #15110E; -webkit-font-smoothing: antialiased; }
+::selection { background: #B4521E; color: #FBF8F1; }
+
+/* Grain overlay : texture papier/fil */
+body::after {
+  content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 90; opacity: .07; mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+
+/* Titres */
+.eyebrow { font-size: .68rem; letter-spacing: .32em; text-transform: uppercase; font-weight: 500; }
+.display { font-family: "Cormorant Garamond", Georgia, serif; font-weight: 400; line-height: .95; letter-spacing: -.01em; }
+
+/* Soulignement animé */
+.ulink { position: relative; display: inline-block; }
+.ulink::after { content: ""; position: absolute; left: 0; bottom: -4px; height: 1px; width: 100%; background: currentColor; transform: scaleX(0); transform-origin: right; transition: transform .45s cubic-bezier(.7,0,.2,1); }
+.ulink:hover::after, .ulink.active::after { transform: scaleX(1); transform-origin: left; }
+
+/* Boutons */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: .75rem; padding: 1.05rem 2.2rem; font-size: .72rem; letter-spacing: .26em; text-transform: uppercase; font-weight: 500; transition: all .4s cubic-bezier(.7,0,.2,1); border: 1px solid currentColor; cursor: pointer; }
+.btn-ink { background: #15110E; color: #F7F2E9; border-color: #15110E; }
+.btn-ink:hover { background: #B4521E; border-color: #B4521E; }
+.btn-ghost:hover { background: #15110E; color: #F7F2E9; }
+.btn-light { color: #FBF8F1; }
+.btn-light:hover { background: #FBF8F1; color: #15110E; }
+
+/* Reveal au scroll */
+.reveal { opacity: 0; transform: translateY(36px); transition: opacity 1s cubic-bezier(.2,.7,.2,1), transform 1s cubic-bezier(.2,.7,.2,1); }
+.reveal.in { opacity: 1; transform: none; }
+.reveal-d1 { transition-delay: .12s; } .reveal-d2 { transition-delay: .24s; } .reveal-d3 { transition-delay: .36s; }
+
+/* Image : masque qui se lève */
+.mask-in { clip-path: inset(0 0 100% 0); transition: clip-path 1.3s cubic-bezier(.7,0,.2,1); }
+.mask-in.in { clip-path: inset(0 0 0 0); }
+
+/* Zoom doux */
+.zoom { transition: transform 1.4s cubic-bezier(.2,.7,.2,1); }
+.group:hover .zoom { transform: scale(1.06); }
+
+/* Marquee */
+.marquee-track { width: max-content; display: flex; }
+
+/* Header */
+#header { transition: background .5s, color .5s, border-color .5s, transform .5s; }
+#header.solid { background: rgba(247,242,233,.94); backdrop-filter: blur(10px); color: #15110E; border-color: rgba(21,17,14,.1); }
+#header.on-hero:not(.solid) { color: #FBF8F1; border-color: rgba(251,248,241,.25); }
+#header.hide { transform: translateY(-100%); }
+
+/* Tiroir panier & menu */
+.drawer { transition: transform .6s cubic-bezier(.7,0,.2,1); }
+.overlay { transition: opacity .5s; }
+
+/* Scrollbar cachée pour carrousels */
+.no-bar { scrollbar-width: none; } .no-bar::-webkit-scrollbar { display: none; }
+
+/* Frame décoratif style "étiquette" */
+.frame { position: relative; }
+.frame::before { content: ""; position: absolute; inset: 14px; border: 1px solid rgba(251,248,241,.55); pointer-events: none; z-index: 2; }
+
+/* Motif de cauris en fond */
+.cowrie-pattern {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='90' height='90' viewBox='0 0 90 90'><g fill='none' stroke='%23FBF8F1' stroke-opacity='.16' stroke-width='1.2'><ellipse cx='45' cy='45' rx='11' ry='18' transform='rotate(35 45 45)'/><path d='M45 30c-3 9-3 21 0 30' transform='rotate(35 45 45)'/></g></svg>");
+}
+
+/* Fiche produit : miniatures */
+.thumb { opacity: .55; transition: opacity .3s; cursor: pointer; border-bottom: 2px solid transparent; }
+.thumb.on, .thumb:hover { opacity: 1; border-color: #15110E; }
+
+/* Pastilles taille */
+.size-opt { min-width: 3.2rem; height: 3.2rem; border: 1px solid rgba(21,17,14,.25); display: grid; place-items: center; font-size: .8rem; letter-spacing: .1em; cursor: pointer; transition: all .3s; }
+.size-opt:hover { border-color: #15110E; }
+.size-opt.on { background: #15110E; color: #F7F2E9; border-color: #15110E; }
+
+/* Champs de formulaire */
+.field { width: 100%; background: transparent; border: 0; border-bottom: 1px solid rgba(21,17,14,.3); padding: 1rem 0 .6rem; font-size: 1rem; outline: none; transition: border-color .3s; border-radius: 0; }
+.field:focus { border-color: #B4521E; }
+.field-label { font-size: .66rem; letter-spacing: .26em; text-transform: uppercase; opacity: .6; }
+.choice { display: flex; gap: 1rem; align-items: center; border: 1px solid rgba(21,17,14,.2); padding: 1.1rem 1.25rem; cursor: pointer; transition: all .3s; }
+.choice:has(input:checked) { border-color: #15110E; background: #EFE7D8; }
+.choice input { accent-color: #B4521E; }
+
+/* Toast */
+#toast { transition: all .5s cubic-bezier(.2,.7,.2,1); }
+
+/* Vidéos verticales */
+.vid-card video { transition: transform 1.2s cubic-bezier(.2,.7,.2,1); }
+.vid-card:hover video { transform: scale(1.05); }
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal, .mask-in { opacity: 1; transform: none; clip-path: none; transition: none; }
+  .animate-marquee { animation: none; }
+  html { scroll-behavior: auto; }
+}
+
+/* Logo Impano : gothique large, lettres collées, © en exposant */
+.logo { font-family: "Syne", "Montserrat", sans-serif; font-weight: 800; letter-spacing: -.075em; text-transform: lowercase; line-height: .85; display: inline-block; position: relative; padding-right: .22em; }
+.logo::after { content: "©"; position: absolute; right: 0; top: .08em; font-size: .17em; font-weight: 600; letter-spacing: 0; line-height: 1; border: 0; }
+.logo-tag { font-family: "Syne", sans-serif; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; }

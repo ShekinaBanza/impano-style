@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Administration — Impano</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#15110E">
+  <link rel="icon" type="image/png" href="icons/favicon.png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="js/tw-config.js"></script>
+  <link rel="stylesheet" href="css/style.css">
+  <style> body::after{display:none} .tab.on{border-bottom:2px solid #B4521E;opacity:1} .tab{opacity:.5;border-bottom:2px solid transparent} </style>
+</head>
+<body class="bg-ivory">
+
+<!-- ============ CONNEXION ============ -->
+<section id="login" class="min-h-screen grid place-items-center px-5 bg-ink text-cowrie">
+  <form id="login-form" class="w-full max-w-sm text-center">
+    <span class="logo text-6xl block mb-3">impano</span>
+    <p class="logo-tag text-[.6rem] opacity-60 mb-12">Espace administration</p>
+    <input id="pw" type="password" placeholder="Mot de passe" autocomplete="current-password" class="field text-center !border-cowrie/40 text-cowrie placeholder:text-cowrie/40">
+    <p id="login-err" class="text-ember text-sm mt-4 h-5"></p>
+    <button class="btn btn-light w-full mt-6">Entrer</button>
+    <p id="first" class="text-xs opacity-50 mt-8 hidden">Premier accès : le mot de passe par défaut est <b>impano2025</b>. Changez-le dans « Paramètres ».</p>
+  </form>
+</section>
+
+<!-- ============ APPLICATION ============ -->
+<div id="app" class="hidden">
+  <header class="bg-ink text-cowrie sticky top-0 z-40">
+    <div class="max-w-[1300px] mx-auto px-5 h-16 flex items-center justify-between">
+      <div class="flex items-baseline gap-4"><a href="index.html" class="logo text-3xl">impano</a><span class="logo-tag text-[.55rem] opacity-60 hidden sm:inline">Administration</span></div>
+      <div class="flex gap-6 eyebrow"><a href="index.html" target="_blank" class="ulink">Voir le site ↗</a><button id="logout" class="ulink">Quitter</button></div>
+    </div>
+  </header>
+
+  <main class="max-w-[1300px] mx-auto px-5 py-10">
+    <nav class="flex gap-8 eyebrow border-b border-ink/10 mb-10">
+      <button class="tab on pb-4" data-t="articles">Articles</button>
+      <button class="tab pb-4" data-t="orders">Commandes <span id="oc" class="ml-1 bg-terra text-cowrie rounded-full px-2 py-0.5 !text-[.6rem]"></span></button>
+      <button class="tab pb-4" data-t="settings">Paramètres</button>
+    </nav>
+
+    <!-- Articles -->
+    <section id="t-articles">
+      <div class="flex flex-wrap gap-4 items-center justify-between mb-8">
+        <div><h1 class="display text-5xl italic">Articles</h1><p id="acount" class="text-sm opacity-60 mt-1"></p></div>
+        <div class="flex flex-wrap gap-3">
+          <input id="q" placeholder="Rechercher…" class="field !w-48 !py-2">
+          <button id="add-new" class="btn btn-ink !py-3">+ Nouvel article</button>
+        </div>
+      </div>
+      <div id="alist" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+    </section>
+
+    <!-- Commandes -->
+    <section id="t-orders" class="hidden">
+      <h1 class="display text-5xl italic mb-2">Commandes</h1>
+      <p class="text-sm opacity-60 mb-8">Les commandes enregistrées sur <b>cet appareil</b>. Les commandes de vos clients vous arrivent sur WhatsApp.</p>
+      <div id="olist" class="space-y-4"></div>
+    </section>
+
+    <!-- Paramètres -->
+    <section id="t-settings" class="hidden max-w-2xl">
+      <h1 class="display text-5xl italic mb-10">Paramètres</h1>
+      <form id="sform" class="space-y-8">
+        <label class="block"><span class="field-label">Numéro WhatsApp (format international, sans +)</span><input name="whatsapp" class="field" placeholder="243978134902"></label>
+        <div class="grid grid-cols-2 gap-8">
+          <label class="block"><span class="field-label">Devise</span><input name="currency" class="field"></label>
+          <label class="block"><span class="field-label">Livraison offerte dès</span><input name="free" type="number" min="0" class="field"></label>
+          <label class="block"><span class="field-label">Livraison Lubumbashi</span><input name="lubum" type="number" min="0" class="field"></label>
+          <label class="block"><span class="field-label">Livraison autres villes</span><input name="autre" type="number" min="0" class="field"></label>
+        </div>
+        <label class="block"><span class="field-label">Nouveau mot de passe admin (laisser vide pour ne pas changer)</span><input name="newpw" type="password" class="field" autocomplete="new-password"></label>
+        <button class="btn btn-ink">Enregistrer les paramètres</button>
+      </form>
+
+      <div class="mt-16 pt-10 border-t border-ink/15">
+        <h2 class="display text-3xl italic mb-3">Sauvegarde</h2>
+        <p class="text-sm opacity-70 leading-relaxed mb-6">Vos articles sont enregistrés dans ce navigateur. Exportez régulièrement une sauvegarde, et importez-la pour retrouver vos données sur un autre appareil.</p>
+        <div class="flex flex-wrap gap-3">
+          <button id="export" class="btn btn-ghost !py-3">Exporter (.json)</button>
+          <label class="btn btn-ghost !py-3 cursor-pointer">Importer<input id="import" type="file" accept="application/json" class="hidden"></label>
+          <button id="reset" class="btn !py-3 text-terra">Rétablir le catalogue d’origine</button>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- ============ FORMULAIRE ARTICLE ============ -->
+<div id="modal" class="fixed inset-0 z-[100] hidden">
+  <div id="m-ov" class="absolute inset-0 bg-ink/60"></div>
+  <form id="pform" class="absolute right-0 top-0 h-full w-full max-w-xl bg-ivory overflow-y-auto p-7 md:p-10 space-y-7">
+    <div class="flex justify-between items-center"><h2 id="m-title" class="display text-4xl italic">Article</h2><button type="button" id="m-x" class="eyebrow">Fermer ✕</button></div>
+
+    <div>
+      <span class="field-label">Photos (la première est la photo principale)</span>
+      <div id="imgs" class="flex gap-3 flex-wrap mt-3"></div>
+      <label class="btn btn-ghost !py-3 mt-4 cursor-pointer">+ Ajouter des photos<input id="files" type="file" accept="image/*" multiple class="hidden"></label>
+    </div>
+
+    <label class="block"><span class="field-label">Nom *</span><input name="pname" required class="field"></label>
+    <div class="grid grid-cols-2 gap-8">
+      <label class="block"><span class="field-label">Prix *</span><input name="price" type="number" min="0" step="1" required class="field"></label>
+      <label class="block"><span class="field-label">Catégorie</span><select name="cat" class="field"></select></label>
+      <label class="block"><span class="field-label">Étiquette</span><input name="tag" placeholder="Pièce unique, Nouveau…" class="field"></label>
+      <label class="block"><span class="field-label">Couleur</span><input name="color" class="field"></label>
+    </div>
+    <label class="block"><span class="field-label">Tailles (séparées par des virgules — vide si aucune)</span><input name="sizes" placeholder="S, M, L, XL" class="field"></label>
+    <label class="block"><span class="field-label">Description</span><textarea name="desc" rows="3" class="field resize-none"></textarea></label>
+    <label class="block"><span class="field-label">Détails (un par ligne)</span><textarea name="details" rows="4" class="field resize-none"></textarea></label>
+    <div class="flex gap-8">
+      <label class="flex items-center gap-3 text-sm"><input type="checkbox" name="soldout" class="accent-[#B4521E] w-4 h-4"> Épuisé</label>
+      <label class="flex items-center gap-3 text-sm"><input type="checkbox" name="ishidden" class="accent-[#B4521E] w-4 h-4"> Masqué (non visible)</label>
+    </div>
+    <div class="flex gap-3 pt-2 sticky bottom-0 bg-ivory py-4">
+      <button class="btn btn-ink flex-1">Enregistrer</button>
+      <button type="button" id="m-del" class="btn !text-terra hidden">Supprimer</button>
+    </div>
+  </form>
+</div>
+
+<div id="toast" class="fixed bottom-8 left-1/2 -translate-x-1/2 z-[120] bg-ink text-ivory text-sm px-6 py-3.5 opacity-0 translate-y-6 pointer-events-none transition-all duration-500"></div>
+
+<script src="js/data.js"></script>
+<script>
+const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const say = (m) => { const t = $("#toast"); t.textContent = m; t.classList.remove("opacity-0", "translate-y-6"); clearTimeout(say._t); say._t = setTimeout(() => t.classList.add("opacity-0", "translate-y-6"), 2400); };
+const sha = async (s) => [...new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode("impano|" + s)))].map((b) => b.toString(16).padStart(2, "0")).join("");
+const esc = (s = "") => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+/* ---------- Connexion ---------- */
+(async () => {
+  const stored = localStorage.getItem("impano_admin_pw");
+  if (!stored) $("#first").classList.remove("hidden");
+  const enter = () => { $("#login").classList.add("hidden"); $("#app").classList.remove("hidden"); init(); };
+  if (sessionStorage.getItem("impano_admin") === "1") return enter();
+  $("#login-form").onsubmit = async (e) => {
+    e.preventDefault();
+    const h = await sha($("#pw").value), ref = stored || (await sha("impano2025"));
+    if (h === ref) { sessionStorage.setItem("impano_admin", "1"); enter(); } else $("#login-err").textContent = "Mot de passe incorrect.";
+  };
+})();
+$("#logout").onclick = () => { sessionStorage.removeItem("impano_admin"); location.reload(); };
+
+/* ---------- Données ---------- */
+let list = JSON.parse(JSON.stringify(ALL_PRODUCTS));
+function persist() {
+  try { localStorage.setItem("impano_products", JSON.stringify(list)); return true; }
+  catch (e) { alert("Stockage plein : les photos sont trop nombreuses ou trop lourdes. Supprimez des photos/articles ou exportez votre sauvegarde."); return false; }
+}
+const CAT = Object.fromEntries(CATEGORIES.map((c) => [c.id, c.short]));
+
+function init() {
+  $("#m-title"); $("[name=cat]").innerHTML = CATEGORIES.map((c) => `<option value="${c.id}">${c.label}</option>`).join("");
+  drawList(); drawOrders(); fillSettings();
+  $$(".tab").forEach((b) => b.onclick = () => {
+    $$(".tab").forEach((x) => x.classList.toggle("on", x === b));
+    ["articles", "orders", "settings"].forEach((t) => $("#t-" + t).classList.toggle("hidden", t !== b.dataset.t));
+  });
+}
+
+/* ---------- Liste des articles ---------- */
+function drawList() {
+  const q = $("#q").value.toLowerCase();
+  const rows = list.filter((p) => p.name.toLowerCase().includes(q));
+  $("#acount").textContent = `${list.length} articles · ${list.filter((p) => p.hidden).length} masqués · ${list.filter((p) => p.soldout).length} épuisés`;
+  $("#alist").innerHTML = rows.map((p) => `
+    <div class="bg-white border border-ink/10 flex flex-col ${p.hidden ? "opacity-60" : ""}">
+      <button data-edit="${p.id}" class="relative aspect-[4/3] bg-bone overflow-hidden text-left">
+        <img src="${p.img}" alt="" class="w-full h-full object-cover" loading="lazy">
+        <span class="absolute top-3 left-3 flex gap-2">${p.soldout ? '<span class="eyebrow bg-terra text-cowrie px-2 py-1 !text-[.55rem]">Épuisé</span>' : ""}${p.hidden ? '<span class="eyebrow bg-ink text-cowrie px-2 py-1 !text-[.55rem]">Masqué</span>' : ""}</span>
+      </button>
+      <div class="p-5 flex-1 flex flex-col gap-3">
+        <div><p class="eyebrow opacity-50 !text-[.58rem]">${CAT[p.cat] || p.cat}</p><h3 class="display text-2xl leading-tight">${esc(p.name)}</h3></div>
+        <div class="flex items-center gap-3 mt-auto">
+          <span class="field-label">Prix</span>
+          <div class="flex items-center border-b border-ink/30"><span class="text-sm">${CONFIG.currency}</span><input type="number" min="0" value="${p.price}" data-price="${p.id}" class="w-20 bg-transparent py-1.5 pl-1 outline-none"></div>
+          <button data-edit="${p.id}" class="eyebrow ulink ml-auto">Modifier</button>
+        </div>
+      </div>
+    </div>`).join("") || '<p class="opacity-60">Aucun article.</p>';
+}
+$("#q").oninput = drawList;
+$("#alist").addEventListener("click", (e) => { const b = e.target.closest("[data-edit]"); if (b) openForm(b.dataset.edit); });
+$("#alist").addEventListener("change", (e) => {
+  const i = e.target.closest("[data-price]"); if (!i) return;
+  const p = list.find((x) => x.id === i.dataset.price); p.price = Math.max(0, +i.value || 0);
+  if (persist()) say(`Prix de « ${p.name} » : ${CONFIG.currency}${p.price}`);
+});
+$("#add-new").onclick = () => openForm(null);
+
+/* ---------- Formulaire ---------- */
+let cur = null, imgs = [];
+const f = () => $("#pform");
+function openForm(id) {
+  cur = id ? list.find((p) => p.id === id) : null;
+  const p = cur || { name: "", price: "", cat: "bonnets", tag: "Nouveau", color: "", desc: "", details: [], sizes: null, gallery: [] };
+  $("#m-title").textContent = cur ? "Modifier l’article" : "Nouvel article";
+  const F = f();
+  F.pname.value = p.name; F.price.value = p.price; F.cat.value = p.cat; F.tag.value = p.tag || ""; F.color.value = p.color || "";
+  F.sizes.value = (p.sizes || []).join(", "); F.desc.value = p.desc || ""; F.details.value = (p.details || []).join("\n");
+  F.soldout.checked = !!p.soldout; F.ishidden.checked = !!p.hidden;
+  imgs = [...(p.gallery || [])]; drawImgs();
+  $("#m-del").classList.toggle("hidden", !cur);
+  $("#modal").classList.remove("hidden"); document.body.style.overflow = "hidden";
+}
+const closeForm = () => { $("#modal").classList.add("hidden"); document.body.style.overflow = ""; };
+$("#m-x").onclick = closeForm; $("#m-ov").onclick = closeForm;
+
+function drawImgs() {
+  $("#imgs").innerHTML = imgs.map((s, i) => `
+    <div class="relative w-24 h-28 bg-bone">
+      <img src="${s}" class="w-full h-full object-cover" alt="">
+      ${i === 0 ? '<span class="absolute bottom-0 inset-x-0 bg-ink text-cowrie text-[.55rem] tracking-widest uppercase text-center py-1">Principale</span>' : `<button type="button" data-main="${i}" class="absolute bottom-0 inset-x-0 bg-ink/70 text-cowrie text-[.55rem] tracking-widest uppercase text-center py-1">Principale ?</button>`}
+      <button type="button" data-rm="${i}" class="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-terra text-cowrie text-xs" aria-label="Retirer">✕</button>
+    </div>`).join("") || '<p class="text-sm opacity-50">Aucune photo.</p>';
+}
+$("#imgs").addEventListener("click", (e) => {
+  const r = e.target.closest("[data-rm]"), m = e.target.closest("[data-main]");
+  if (r) imgs.splice(+r.dataset.rm, 1);
+  if (m) imgs.unshift(imgs.splice(+m.dataset.main, 1)[0]);
+  drawImgs();
+});
+function shrink(file, max = 900, q = 0.74) {
+  return new Promise((res, rej) => {
+    const fr = new FileReader();
+    fr.onerror = rej;
+    fr.onload = () => { const im = new Image(); im.onerror = rej; im.onload = () => {
+      const k = Math.min(1, max / Math.max(im.width, im.height)), c = document.createElement("canvas");
+      c.width = Math.round(im.width * k); c.height = Math.round(im.height * k);
+      c.getContext("2d").drawImage(im, 0, 0, c.width, c.height); res(c.toDataURL("image/jpeg", q));
+    }; im.src = fr.result; };
+    fr.readAsDataURL(file);
+  });
+}
+$("#files").onchange = async (e) => {
+  for (const file of e.target.files) { try { imgs.push(await shrink(file)); } catch { say("Image illisible : " + file.name); } }
+  e.target.value = ""; drawImgs();
+};
+
+f().onsubmit = (e) => {
+  e.preventDefault();
+  const F = f();
+  if (!imgs.length) return alert("Ajoutez au moins une photo.");
+  const sizes = F.sizes.value.split(",").map((s) => s.trim()).filter(Boolean);
+  const data = {
+    name: F.pname.value.trim(), price: Math.max(0, +F.price.value || 0), cat: F.cat.value, tag: F.tag.value.trim() || "Nouveau",
+    color: F.color.value.trim(), desc: F.desc.value.trim(), details: F.details.value.split("\n").map((s) => s.trim()).filter(Boolean),
+    sizes: sizes.length ? sizes : undefined, img: imgs[0], gallery: [...imgs], soldout: F.soldout.checked || undefined, hidden: F.ishidden.checked || undefined
+  };
+  if (cur) Object.assign(cur, data, { sizes: data.sizes, soldout: data.soldout, hidden: data.hidden });
+  else {
+    const slug = data.name.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "article";
+    list.unshift({ id: slug + "-" + Math.random().toString(36).slice(2, 6), ...data });
+  }
+  if (!persist()) return;
+  closeForm(); drawList(); say(cur ? "Article mis à jour ✦" : "Article ajouté ✦");
+};
+$("#m-del").onclick = () => {
+  if (!cur || !confirm(`Supprimer « ${cur.name} » définitivement ?`)) return;
+  list = list.filter((p) => p !== cur); persist(); closeForm(); drawList(); say("Article supprimé");
+};
+
+/* ---------- Commandes ---------- */
+function drawOrders() {
+  const os = JSON.parse(localStorage.getItem("impano_orders") || "[]").reverse();
+  $("#oc").textContent = os.length || ""; $("#oc").classList.toggle("hidden", !os.length);
+  $("#olist").innerHTML = os.map((o) => `
+    <div class="bg-white border border-ink/10 p-6 grid md:grid-cols-12 gap-4">
+      <div class="md:col-span-3"><p class="display text-2xl">${esc(o.ref)}</p><p class="text-xs opacity-60">${new Date(o.date).toLocaleString("fr-FR")}</p></div>
+      <div class="md:col-span-5 text-sm">${o.items.map((i) => { const p = ALL_PRODUCTS.find((x) => x.id === i.id); return `<p>${i.qty} × ${esc(p ? p.name : i.id)}${i.size ? " (" + i.size + ")" : ""}</p>`; }).join("")}</div>
+      <div class="md:col-span-3 text-sm"><p>${esc(o.client.prenom)} ${esc(o.client.nom)}</p><a class="ulink text-terra" target="_blank" href="https://wa.me/${o.client.tel.replace(/\D/g, "")}">${esc(o.client.tel)}</a></div>
+      <div class="md:col-span-1 text-right display text-2xl">${CONFIG.currency}${o.total}</div>
+    </div>`).join("") || '<p class="opacity-60">Aucune commande enregistrée sur cet appareil pour le moment.</p>';
+}
+
+/* ---------- Paramètres & sauvegarde ---------- */
+function fillSettings() {
+  const F = $("#sform");
+  F.whatsapp.value = CONFIG.whatsapp; F.currency.value = CONFIG.currency; F.free.value = CONFIG.freeShippingFrom;
+  F.lubum.value = CONFIG.shipping.lubumbashi; F.autre.value = CONFIG.shipping.autre;
+}
+$("#sform").onsubmit = async (e) => {
+  e.preventDefault(); const F = e.target;
+  const cfg = { whatsapp: F.whatsapp.value.replace(/\D/g, ""), currency: F.currency.value || "$", freeShippingFrom: +F.free.value || 0, shipping: { lubumbashi: +F.lubum.value || 0, autre: +F.autre.value || 0 } };
+  localStorage.setItem("impano_config", JSON.stringify(cfg)); Object.assign(CONFIG, cfg);
+  if (F.newpw.value) { if (F.newpw.value.length < 6) return alert("Mot de passe : 6 caractères minimum."); localStorage.setItem("impano_admin_pw", await sha(F.newpw.value)); F.newpw.value = ""; }
+  say("Paramètres enregistrés ✦");
+};
+$("#export").onclick = () => {
+  const blob = new Blob([JSON.stringify({ products: list, config: JSON.parse(localStorage.getItem("impano_config") || "null") }, null, 1)], { type: "application/json" });
+  const a = Object.assign(document.createElement("a"), { href: URL.createObjectURL(blob), download: "impano-sauvegarde-" + new Date().toISOString().slice(0, 10) + ".json" }); a.click();
+};
+$("#import").onchange = async (e) => {
+  try {
+    const d = JSON.parse(await e.target.files[0].text());
+    if (!Array.isArray(d.products)) throw 0;
+    list = d.products; if (d.config) localStorage.setItem("impano_config", JSON.stringify(d.config));
+    persist(); drawList(); say("Sauvegarde importée ✦");
+  } catch { alert("Fichier invalide."); }
+  e.target.value = "";
+};
+$("#reset").onclick = () => { if (confirm("Rétablir le catalogue d’origine ? Vos modifications seront perdues.")) { localStorage.removeItem("impano_products"); location.reload(); } };
+</script>
+</body>
+</html>

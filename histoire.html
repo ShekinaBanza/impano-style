@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#15110E">
+  <link rel="icon" type="image/png" href="icons/favicon.png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Impano">
+  <title>La Maison — Impano</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="js/tw-config.js"></script>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body data-hero>
+
+<!-- Ouverture -->
+<section class="relative h-[calc(100svh-34px)] min-h-[560px] bg-ink text-cowrie overflow-hidden">
+  <video class="absolute inset-0 w-full h-full object-cover opacity-80" src="assets/video/v37.mp4" poster="assets/img/p16.jpg" autoplay muted loop playsinline></video>
+  <div class="absolute inset-0 bg-gradient-to-t from-ink/80 via-ink/20 to-ink/40"></div>
+  <div class="relative h-full max-w-[1500px] mx-auto px-5 md:px-10 flex flex-col justify-end pb-16">
+    <p class="eyebrow mb-6">La Maison</p>
+    <h1 class="display italic text-[clamp(3.5rem,11vw,10rem)] leading-[.85]">Le don,<br>fil après fil</h1>
+  </div>
+</section>
+
+<!-- Manifeste -->
+<section class="max-w-4xl mx-auto px-5 md:px-10 py-28 text-center reveal">
+  <svg class="w-8 h-12 mx-auto text-terra mb-8"><use href="#cowrie"/></svg>
+  <p class="display text-3xl md:text-5xl leading-[1.15]">Impano, <span class="italic text-terra">« le don »</span>, est une maison de crochet née à Lubumbashi. Nous croyons qu’un vêtement fait main est un cadeau : à celui qui l’a créé, comme à celui qui le porte.</p>
+</section>
+
+<!-- Trois valeurs -->
+<section class="max-w-[1500px] mx-auto px-5 md:px-10 pb-28 grid md:grid-cols-3 gap-px bg-ink/15 border-y border-ink/15">
+  <div class="bg-ivory p-10 md:p-14 reveal"><p class="display text-7xl italic text-terra">01</p><h3 class="display text-3xl mt-6 mb-4">100 % fait main</h3><p class="opacity-70 leading-relaxed">Aucune machine. Chaque maille est nouée par une artisane de l’atelier, avec du fil choisi pour sa douceur et sa tenue.</p></div>
+  <div class="bg-ivory p-10 md:p-14 reveal reveal-d1"><p class="display text-7xl italic text-terra">02</p><h3 class="display text-3xl mt-6 mb-4">Pièces uniques</h3><p class="opacity-70 leading-relaxed">Un motif, une couleur, un exemplaire. Une fois partie, une pièce ne sera plus jamais reprise : c’est votre histoire.</p></div>
+  <div class="bg-ivory p-10 md:p-14 reveal reveal-d2"><p class="display text-7xl italic text-terra">03</p><h3 class="display text-3xl mt-6 mb-4">Racines africaines</h3><p class="opacity-70 leading-relaxed">Cauris, perles, motifs traditionnels : nous rendons hommage à des siècles de symboles et les portons dans le présent.</p></div>
+</section>
+
+<!-- Cauris -->
+<section id="cauris" class="bg-terra text-cowrie relative overflow-hidden scroll-mt-24">
+  <div class="absolute inset-0 cowrie-pattern"></div>
+  <div class="relative max-w-[1500px] mx-auto px-5 md:px-10 py-24 md:py-32 grid lg:grid-cols-2 gap-16 items-center">
+    <div class="reveal">
+      <p class="eyebrow opacity-75 mb-5">Le savoir</p>
+      <h2 class="display text-5xl md:text-7xl mb-8">Que disent<br><span class="italic">les cauris ?</span></h2>
+      <p class="text-lg font-light leading-relaxed opacity-90 mb-5">Avant l’ère des billets et des pièces, le cauri servait de monnaie d’échange dans plusieurs régions du monde. En Afrique subsaharienne, il est rarement resté un simple objet de valeur.</p>
+      <ul class="space-y-3 text-lg font-light">
+        <li class="flex gap-4 items-start"><svg class="w-4 h-6 mt-1 shrink-0"><use href="#cowrie"/></svg>Prospérité & richesse matérielle</li>
+        <li class="flex gap-4 items-start"><svg class="w-4 h-6 mt-1 shrink-0"><use href="#cowrie"/></svg>Fertilité & féminité</li>
+        <li class="flex gap-4 items-start"><svg class="w-4 h-6 mt-1 shrink-0"><use href="#cowrie"/></svg>Protection contre le mauvais œil</li>
+      </ul>
+    </div>
+    <div class="grid grid-cols-2 gap-4"><img src="assets/img/p14c.jpg" alt="Bonnet au cauri" class="w-full h-full object-cover aspect-[3/4] mt-10" loading="lazy"><img src="assets/img/p32.jpg" alt="Bonnet violet au cauri" class="w-full h-full object-cover aspect-[3/4]" loading="lazy"></div>
+  </div>
+</section>
+
+<!-- Perles & motifs -->
+<section class="max-w-[1500px] mx-auto px-5 md:px-10 py-24 md:py-32 grid lg:grid-cols-2 gap-16 items-center">
+  <div class="grid grid-cols-2 gap-4 order-2 lg:order-1"><img src="assets/img/p23c.jpg" alt="Bonnet blanc à perles" class="aspect-[3/4] w-full object-cover" loading="lazy"><img src="assets/img/p33c.jpg" alt="Chapeau Wosoko" class="aspect-[3/4] w-full object-cover mt-10" loading="lazy"></div>
+  <div class="order-1 lg:order-2 reveal">
+    <p class="eyebrow text-terra mb-5">Perles & motifs</p>
+    <h2 class="display text-5xl md:text-7xl mb-8">Des histoires<br><span class="italic">à porter</span></h2>
+    <p class="leading-relaxed opacity-75 mb-5 text-lg">Les perles comptent parmi les accessoires les plus portés en Afrique et dans le monde : échange, statut, alliance, identité culturelle. Nous les glissons dans nos bonnets pour qu’elles continuent de raconter.</p>
+    <p class="leading-relaxed opacity-75 text-lg">Notre série d’imprimés traditionnels débute avec le <a href="produit.html?id=chapeau-wosoko" class="ulink text-terra">chapeau Wosoko</a> : un hommage aux motifs, aux proverbes et aux événements historiques que ces dessins transmettent depuis des siècles.</p>
+  </div>
+</section>
+
+<!-- Atelier -->
+<section id="atelier" class="bg-ink text-cowrie scroll-mt-24">
+  <div class="max-w-[1500px] mx-auto px-5 md:px-10 py-24 md:py-32 grid lg:grid-cols-12 gap-14 items-center">
+    <div class="lg:col-span-5 reveal"><img src="assets/img/p17.jpg" alt="L’atelier" class="w-full aspect-[4/5] object-cover grayscale" loading="lazy"></div>
+    <div class="lg:col-span-7 lg:pl-12 reveal reveal-d1">
+      <p class="eyebrow opacity-60 mb-6">L’atelier</p>
+      <h2 class="display text-5xl md:text-7xl mb-8">Des mains,<br><span class="italic">du fil, du temps.</span></h2>
+      <p class="opacity-75 leading-relaxed text-lg mb-10 max-w-xl">Nos sacs bananes, nos bonnets et nos ensembles sont d’abord des heures de patience. Certains modèles sont disponibles en stock, d’autres se commandent : nous les crochetons pour vous.</p>
+      <a href="boutique.html" class="btn btn-light">Passer commande</a>
+    </div>
+  </div>
+</section>
+
+<!-- Fashion week -->
+<section class="max-w-[1500px] mx-auto px-5 md:px-10 py-24 md:py-32">
+  <div class="grid lg:grid-cols-12 gap-10 items-center">
+    <div class="lg:col-span-4 reveal"><p class="eyebrow text-terra mb-5">Sur le podium</p><h2 class="display text-5xl md:text-6xl mb-6">Lubumbashi <span class="italic">Fashion Week</span></h2><p class="opacity-70 leading-relaxed">En 2025, le crochet Impano a défilé sur le tapis rouge : gilets solaires, ensembles ajourés, fierté locale.</p></div>
+    <div class="lg:col-span-8 grid grid-cols-3 gap-4">
+      <img src="assets/img/p05.jpg" alt="Défilé" class="aspect-[3/4] object-cover w-full reveal" loading="lazy">
+      <video data-auto class="aspect-[3/4] object-cover w-full reveal reveal-d1 mt-10" src="assets/video/v24.mp4" muted loop playsinline preload="metadata"></video>
+      <img src="assets/img/p06.jpg" alt="Défilé" class="aspect-[3/4] object-cover w-full reveal reveal-d2" loading="lazy">
+    </div>
+  </div>
+</section>
+
+<section class="bg-bone py-24 text-center reveal">
+  <h2 class="display text-5xl md:text-7xl mb-8">Prête à <span class="italic">recevoir le don ?</span></h2>
+  <a href="boutique.html" class="btn btn-ink">Découvrir la collection</a>
+</section>
+
+<div id="footer"></div>
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

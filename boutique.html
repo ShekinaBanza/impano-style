@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#15110E">
+  <link rel="icon" type="image/png" href="icons/favicon.png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Impano">
+  <title>Boutique — Impano</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="js/tw-config.js"></script>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<main class="pt-[8.5rem]">
+  <section class="max-w-[1500px] mx-auto px-5 md:px-10 pb-10">
+    <p class="eyebrow text-terra mb-4"><a href="index.html" class="ulink">Accueil</a> &nbsp;/&nbsp; Boutique</p>
+    <h1 id="title" class="display text-6xl md:text-8xl italic">La boutique</h1>
+    <p id="blurb" class="mt-6 max-w-xl opacity-70 leading-relaxed">Toutes nos pièces sont crochetées à la main à Lubumbashi. Quand une pièce unique est partie, elle ne revient pas.</p>
+  </section>
+
+  <!-- Filtres -->
+  <div class="sticky top-20 z-30 bg-ivory/95 backdrop-blur border-y border-ink/10">
+    <div class="max-w-[1500px] mx-auto px-5 md:px-10 h-16 flex items-center justify-between gap-6">
+      <div id="filters" class="flex gap-7 overflow-x-auto no-bar eyebrow whitespace-nowrap"></div>
+      <div class="flex items-center gap-3 shrink-0">
+        <span id="count" class="eyebrow opacity-50 hidden sm:inline"></span>
+        <select id="sort" class="bg-transparent eyebrow border-0 outline-none cursor-pointer">
+          <option value="def">Sélection</option><option value="asc">Prix croissant</option><option value="desc">Prix décroissant</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <section class="max-w-[1500px] mx-auto px-5 md:px-10 py-14 md:py-20">
+    <div id="grid" class="grid grid-cols-2 lg:grid-cols-4 gap-x-4 md:gap-x-7 gap-y-14"></div>
+  </section>
+
+  <!-- Bandeau sur mesure -->
+  <section class="bg-ink text-cowrie">
+    <div class="max-w-[1500px] mx-auto px-5 md:px-10 py-20 grid md:grid-cols-2 gap-10 items-center">
+      <h2 class="display text-5xl md:text-6xl">Une idée précise ?<br><span class="italic">Nous la crochetons.</span></h2>
+      <div>
+        <p class="opacity-75 leading-relaxed mb-8 max-w-md">Couleur, taille, motif : écrivez-nous sur WhatsApp et nous créons votre pièce sur mesure. Nos sacs sont, eux aussi, disponibles sur commande.</p>
+        <a id="wa" target="_blank" rel="noopener" class="btn btn-light">Écrire sur WhatsApp</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div id="footer"></div>
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const params = new URLSearchParams(location.search);
+  let cat = params.get("cat") || "all", sort = "def";
+  const FILTERS = [{ id: "all", label: "Tout" }, ...CATEGORIES.map((c) => ({ id: c.id, label: c.short }))];
+  $("#wa").href = `https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent("Bonjour Impano, j’aimerais une création sur mesure.")}`;
+
+  function draw() {
+    $("#filters").innerHTML = FILTERS.map((f) => `<button data-f="${f.id}" class="ulink ${cat === f.id ? "active" : "opacity-55"}">${f.label}</button>`).join("");
+    let list = PRODUCTS.filter((p) => cat === "all" || p.cat === cat);
+    if (sort === "asc") list = [...list].sort((a, b) => a.price - b.price);
+    if (sort === "desc") list = [...list].sort((a, b) => b.price - a.price);
+    const c = CATEGORIES.find((x) => x.id === cat);
+    $("#title").textContent = c ? c.label : "La boutique";
+    $("#blurb").textContent = c ? c.blurb + " Fait main, pièces limitées." : "Toutes nos pièces sont crochetées à la main à Lubumbashi. Quand une pièce unique est partie, elle ne revient pas.";
+    $("#count").textContent = list.length + " pièces";
+    $("#grid").innerHTML = list.map((p, i) => productCard(p, `reveal reveal-d${i % 4 > 3 ? 3 : i % 4}`)).join("");
+    watchReveal();
+  }
+  $("#filters").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-f]"); if (!b) return;
+    cat = b.dataset.f; history.replaceState(null, "", cat === "all" ? "boutique.html" : "?cat=" + cat); draw();
+  });
+  $("#sort").onchange = (e) => { sort = e.target.value; draw(); };
+  draw();
+});
+</script>
+</body>
+</html>

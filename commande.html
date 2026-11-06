@@ -1,0 +1,176 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#15110E">
+  <link rel="icon" type="image/png" href="icons/favicon.png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Impano">
+  <title>Commande — Impano</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="js/tw-config.js"></script>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<main class="pt-[8.5rem] pb-24">
+  <div class="max-w-[1300px] mx-auto px-5 md:px-10">
+    <p class="eyebrow text-terra mb-4"><a href="boutique.html" class="ulink">← Continuer mes achats</a></p>
+    <h1 class="display text-6xl md:text-8xl italic mb-14">Ma commande</h1>
+
+    <!-- Panier vide -->
+    <div id="empty" class="hidden text-center py-24">
+      <svg class="w-10 h-14 mx-auto mb-6 text-terra"><use href="#cowrie"/></svg>
+      <p class="display text-4xl mb-4">Votre panier est vide</p>
+      <a href="boutique.html" class="btn btn-ink mt-6">Découvrir la boutique</a>
+    </div>
+
+    <form id="form" class="hidden grid lg:grid-cols-12 gap-14 lg:gap-20" novalidate>
+      <div class="lg:col-span-7 space-y-14">
+        <fieldset>
+          <legend class="display text-3xl italic mb-8"><span class="text-terra">01</span> &nbsp;Vos coordonnées</legend>
+          <div class="grid sm:grid-cols-2 gap-x-8 gap-y-7">
+            <label><span class="field-label">Prénom *</span><input name="prenom" required autocomplete="given-name" class="field"></label>
+            <label><span class="field-label">Nom *</span><input name="nom" required autocomplete="family-name" class="field"></label>
+            <label><span class="field-label">Téléphone / WhatsApp *</span><input name="tel" type="tel" required autocomplete="tel" placeholder="+243 …" class="field"></label>
+            <label><span class="field-label">Email (facultatif)</span><input name="email" type="email" autocomplete="email" class="field"></label>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend class="display text-3xl italic mb-8"><span class="text-terra">02</span> &nbsp;Livraison</legend>
+          <div class="grid sm:grid-cols-3 gap-3 mb-8">
+            <label class="choice"><input type="radio" name="mode" value="lubumbashi" checked><span><b class="font-medium">Lubumbashi</b><br><span class="text-xs opacity-60">…</span></span></label>
+            <label class="choice"><input type="radio" name="mode" value="autre"><span><b class="font-medium">Autre ville</b><br><span class="text-xs opacity-60">…</span></span></label>
+            <label class="choice"><input type="radio" name="mode" value="retrait"><span><b class="font-medium">Retrait atelier</b><br><span class="text-xs opacity-60">Gratuit</span></span></label>
+          </div>
+          <div id="addr" class="grid sm:grid-cols-2 gap-x-8 gap-y-7">
+            <label><span class="field-label">Ville *</span><input name="ville" value="Lubumbashi" class="field"></label>
+            <label><span class="field-label">Quartier / Commune *</span><input name="quartier" class="field"></label>
+            <label class="sm:col-span-2"><span class="field-label">Adresse & repère *</span><input name="adresse" placeholder="Avenue, numéro, près de…" class="field"></label>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend class="display text-3xl italic mb-8"><span class="text-terra">03</span> &nbsp;Paiement</legend>
+          <div class="grid sm:grid-cols-2 gap-3">
+            <label class="choice"><input type="radio" name="pay" value="Mobile Money" checked><span><b class="font-medium">Mobile Money</b><br><span class="text-xs opacity-60">M-Pesa, Airtel Money, Orange Money — les instructions vous sont envoyées</span></span></label>
+            <label class="choice"><input type="radio" name="pay" value="Paiement à la livraison"><span><b class="font-medium">À la livraison</b><br><span class="text-xs opacity-60">Vous payez à la réception de la commande</span></span></label>
+          </div>
+          <label class="block mt-8"><span class="field-label">Note pour l’atelier (couleur, mensurations, cadeau…)</span><textarea name="note" rows="2" class="field resize-none"></textarea></label>
+        </fieldset>
+      </div>
+
+      <!-- Récapitulatif -->
+      <aside class="lg:col-span-5">
+        <div class="bg-bone p-7 md:p-10 lg:sticky lg:top-32">
+          <h2 class="display text-3xl italic mb-6">Récapitulatif</h2>
+          <div id="lines" class="divide-y divide-ink/10 mb-6"></div>
+          <dl class="space-y-3 text-sm">
+            <div class="flex justify-between"><dt class="opacity-70">Sous-total</dt><dd id="s-sub"></dd></div>
+            <div class="flex justify-between"><dt class="opacity-70">Livraison</dt><dd id="s-ship"></dd></div>
+            <div class="flex justify-between items-end border-t border-ink/20 pt-5 mt-4"><dt class="eyebrow">Total</dt><dd id="s-total" class="display text-4xl"></dd></div>
+          </dl>
+          <p id="err" class="text-terra text-sm mt-5 hidden"></p>
+          <button class="btn btn-ink w-full mt-8">Confirmer la commande</button>
+          <p class="text-xs opacity-55 text-center mt-4 leading-relaxed">Aucun paiement n’est demandé maintenant. Nous vous confirmons la commande par WhatsApp ou téléphone.</p>
+        </div>
+      </aside>
+    </form>
+
+    <!-- Confirmation -->
+    <div id="done" class="hidden max-w-2xl mx-auto text-center py-10">
+      <svg class="w-12 h-16 mx-auto mb-8 text-terra"><use href="#cowrie"/></svg>
+      <p class="eyebrow text-terra mb-4">Commande enregistrée</p>
+      <h2 class="display text-5xl md:text-7xl italic mb-6">Merci <span id="d-name"></span></h2>
+      <p class="opacity-75 leading-relaxed mb-3">Votre numéro de commande : <b id="d-ref" class="font-medium"></b></p>
+      <p class="opacity-75 leading-relaxed mb-10">Dernière étape : envoyez-nous le récapitulatif sur WhatsApp pour que nous confirmions la disponibilité et le paiement.</p>
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <a id="d-wa" target="_blank" rel="noopener" class="btn btn-ink">Envoyer sur WhatsApp</a>
+        <a href="boutique.html" class="btn btn-ghost">Retour à la boutique</a>
+      </div>
+    </div>
+  </div>
+</main>
+
+<div id="footer"></div>
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const form = $("#form");
+  // Remplit les prix de livraison (les gabarits ${...} ci-dessus ne sont pas interprétés en HTML)
+  $$(".choice input[name=mode]").forEach((r) => {
+    const sm = r.parentElement.querySelector("span span");
+    sm.textContent = r.value === "retrait" ? "Gratuit" : fmt(CONFIG.shipping[r.value]);
+  });
+
+  const ship = () => {
+    const m = form.mode.value, sub = Cart.subtotal();
+    if (m === "retrait") return 0;
+    if (m === "lubumbashi" && sub >= CONFIG.freeShippingFrom) return 0;
+    return CONFIG.shipping[m];
+  };
+  function summary() {
+    $("#lines").innerHTML = Cart.items.map((it) => { const p = byId(it.id); return `
+      <div class="flex gap-4 py-4 items-center">
+        <div class="relative w-16 h-20 shrink-0"><img src="${p.img}" alt="" class="w-full h-full object-cover"><span class="absolute -top-2 -right-2 bg-ink text-cowrie text-[.65rem] w-5 h-5 grid place-items-center rounded-full">${it.qty}</span></div>
+        <div class="flex-1"><p class="display text-xl leading-tight">${p.name}</p><p class="text-xs opacity-55">${p.color}${it.size ? " · " + it.size : ""}</p></div>
+        <p class="text-sm">${fmt(p.price * it.qty)}</p></div>`; }).join("");
+    const s = ship();
+    $("#s-sub").textContent = fmt(Cart.subtotal());
+    $("#s-ship").textContent = s ? fmt(s) : "Offerte";
+    $("#s-total").textContent = fmt(Cart.subtotal() + s);
+    $("#addr").classList.toggle("hidden", form.mode.value === "retrait");
+  }
+  function show() {
+    const has = Cart.items.length > 0;
+    $("#empty").classList.toggle("hidden", has); form.classList.toggle("hidden", !has);
+    if (has) summary();
+  }
+  form.addEventListener("change", summary);
+  // Re-synchronise si le panier change dans le tiroir
+  const orig = Cart.save.bind(Cart); Cart.save = function () { orig(); show(); };
+  show();
+
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const f = new FormData(form), g = (k) => (f.get(k) || "").toString().trim();
+    const retrait = g("mode") === "retrait";
+    const need = ["prenom", "nom", "tel", ...(retrait ? [] : ["ville", "quartier", "adresse"])];
+    const miss = need.filter((k) => !g(k));
+    $$(".field").forEach((i) => i.style.borderColor = "");
+    if (miss.length) {
+      miss.forEach((k) => form[k].style.borderColor = "#B4521E");
+      $("#err").textContent = "Merci de compléter les champs en surbrillance."; $("#err").classList.remove("hidden");
+      form[miss[0]].focus(); return;
+    }
+    $("#err").classList.add("hidden");
+
+    const s = ship(), total = Cart.subtotal() + s;
+    const ref = "IMP-" + Date.now().toString(36).toUpperCase().slice(-6);
+    const lines = Cart.items.map((it) => { const p = byId(it.id); return `• ${it.qty} × ${p.name}${it.size ? " (taille " + it.size + ")" : ""} — ${fmt(p.price * it.qty)}`; }).join("\n");
+    const msg = `Bonjour Impano 👋\nNouvelle commande *${ref}*\n\n${lines}\n\nSous-total : ${fmt(Cart.subtotal())}\nLivraison : ${s ? fmt(s) : "offerte"}\n*Total : ${fmt(total)}*\n\n👤 ${g("prenom")} ${g("nom")}\n📞 ${g("tel")}\n📍 ${retrait ? "Retrait à l’atelier" : `${g("adresse")}, ${g("quartier")}, ${g("ville")}`}\n💳 ${g("pay")}${g("note") ? "\n📝 " + g("note") : ""}`;
+
+    const orders = JSON.parse(localStorage.getItem("impano_orders") || "[]");
+    orders.push({ ref, date: new Date().toISOString(), total, items: Cart.items, client: { prenom: g("prenom"), nom: g("nom"), tel: g("tel"), email: g("email") } });
+    localStorage.setItem("impano_orders", JSON.stringify(orders));
+
+    $("#d-name").textContent = g("prenom"); $("#d-ref").textContent = ref;
+    $("#d-wa").href = `https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(msg)}`;
+    form.classList.add("hidden"); $("#done").classList.remove("hidden");
+    Cart.items = []; localStorage.setItem("impano_cart_v1", "[]"); Cart.render();
+    scrollTo({ top: 0, behavior: "smooth" });
+  });
+});
+</script>
+</body>
+</html>
+

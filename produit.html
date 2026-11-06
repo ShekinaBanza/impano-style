@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#15110E">
+  <link rel="icon" type="image/png" href="icons/favicon.png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Impano">
+  <title>Produit — Impano</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="js/tw-config.js"></script>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<main class="pt-[8.5rem]">
+  <div id="pdp" class="max-w-[1500px] mx-auto px-5 md:px-10"></div>
+
+  <section class="max-w-[1500px] mx-auto px-5 md:px-10 py-24">
+    <div class="flex items-end justify-between mb-12">
+      <h2 class="display text-5xl md:text-6xl">Vous aimerez <span class="italic">aussi</span></h2>
+      <a href="boutique.html" class="eyebrow ulink hidden sm:inline">Tout voir</a>
+    </div>
+    <div id="more" class="grid grid-cols-2 lg:grid-cols-4 gap-x-4 md:gap-x-7 gap-y-12"></div>
+  </section>
+</main>
+
+<div id="footer"></div>
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const p = byId(new URLSearchParams(location.search).get("id"));
+  if (!p) { location.replace("boutique.html"); return; }
+  document.title = p.name + " — Impano";
+  const cat = CATEGORIES.find((c) => c.id === p.cat);
+  let size = null, qty = 1, cur = 0;
+
+  $("#pdp").innerHTML = `
+  <p class="eyebrow text-terra mb-8"><a href="index.html" class="ulink">Accueil</a> / <a href="boutique.html?cat=${cat.id}" class="ulink">${cat.short}</a> / ${p.name}</p>
+  <div class="grid lg:grid-cols-12 gap-10 lg:gap-16">
+    <div class="lg:col-span-7 grid grid-cols-[4.5rem_1fr] gap-4 items-start">
+      <div id="thumbs" class="flex flex-col gap-3">
+        ${p.gallery.map((g, i) => `<button class="thumb ${i ? "" : "on"} aspect-[3/4] overflow-hidden" data-i="${i}"><img src="${g}" alt="" class="w-full h-full object-cover"></button>`).join("")}
+      </div>
+      <div class="relative overflow-hidden bg-bone aspect-[4/5] cursor-zoom-in" id="stage">
+        <img id="main" src="${p.gallery[0]}" alt="${p.name}" class="w-full h-full object-cover transition-transform duration-500 origin-center">
+        <span class="absolute top-5 left-5 eyebrow bg-ivory/90 px-3 py-1.5 !text-[.58rem]">${p.tag}</span>
+      </div>
+    </div>
+
+    <div class="lg:col-span-5 lg:sticky lg:top-32 self-start">
+      <p class="eyebrow opacity-55 mb-4">${cat.label}</p>
+      <h1 class="display text-5xl md:text-7xl italic mb-5">${p.name}</h1>
+      <p class="text-2xl mb-8">${fmt(p.price)} <span class="text-xs opacity-50 tracking-widest uppercase ml-2">${CONFIG.currency === "$" ? "USD" : ""}</span></p>
+      <p class="leading-relaxed opacity-80 mb-8">${p.desc}</p>
+
+      <p class="field-label mb-3">Couleur · <span class="opacity-100">${p.color}</span></p>
+      ${p.sizes ? `<div class="mt-8"><p class="field-label mb-3">Taille <span id="size-err" class="text-terra normal-case tracking-normal ml-2 hidden">— veuillez choisir</span></p>
+        <div id="sizes" class="flex gap-3 flex-wrap">${p.sizes.map((s) => `<button class="size-opt" data-s="${s}">${s}</button>`).join("")}</div>
+        <p class="text-xs opacity-55 mt-3">Pièce réalisée sur mesure : nous vous contactons pour valider vos mensurations.</p></div>` : ""}
+
+      <div class="flex gap-4 mt-10">
+        <div class="flex items-center border border-ink/25 h-14">
+          <button class="w-12 h-full" id="minus" aria-label="Moins">−</button><span id="qty" class="w-8 text-center">1</span><button class="w-12 h-full" id="plus" aria-label="Plus">+</button>
+        </div>
+        ${p.soldout ? `<button class="btn btn-ink flex-1 opacity-40 cursor-not-allowed" disabled>Épuisé</button>` : `<button id="add" class="btn btn-ink flex-1">Ajouter au panier</button>`}
+      </div>
+      ${p.soldout ? `<a id="ask" target="_blank" rel="noopener" class="btn btn-ghost w-full mt-3" href="https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent("Bonjour, ‘"+p.name+"’ est épuisé : pouvez-vous me le recréer ?")}">Demander une création similaire</a>` : `<button id="buy" class="btn btn-ghost w-full mt-3">Commander maintenant</button>`}
+
+      <div class="mt-10 border-t border-ink/15">
+        ${[["Détails de la pièce", p.details.map((d) => `<li>${d}</li>`).join("")],
+           ["Livraison & paiement", `<li>Retrait gratuit à l’atelier de Lubumbashi</li><li>Livraison ${fmt(CONFIG.shipping.lubumbashi)} à Lubumbashi, ${fmt(CONFIG.shipping.autre)} ailleurs</li><li>Offerte dès ${fmt(CONFIG.freeShippingFrom)} d’achat</li><li>Mobile Money ou paiement à la livraison</li>`],
+           ["Entretien", `<li>Lavage à la main, eau froide</li><li>Séchage à plat</li><li>Ne pas essorer ni repasser</li>`]]
+          .map(([t, c]) => `<details class="border-b border-ink/15 py-5 group"><summary class="eyebrow cursor-pointer list-none flex justify-between">${t}<span class="group-open:rotate-45 transition-transform text-lg leading-none">+</span></summary><ul class="mt-4 space-y-2 text-sm opacity-75 list-disc pl-5">${c}</ul></details>`).join("")}
+      </div>
+    </div>
+  </div>`;
+
+  // Galerie
+  $("#thumbs").onclick = (e) => {
+    const b = e.target.closest(".thumb"); if (!b) return;
+    $$(".thumb").forEach((t) => t.classList.remove("on")); b.classList.add("on");
+    $("#main").src = p.gallery[b.dataset.i];
+  };
+  // Zoom au survol
+  const st = $("#stage"), mi = $("#main");
+  st.onmousemove = (e) => { const r = st.getBoundingClientRect(); mi.style.transformOrigin = `${((e.clientX - r.left) / r.width) * 100}% ${((e.clientY - r.top) / r.height) * 100}%`; mi.style.transform = "scale(1.8)"; };
+  st.onmouseleave = () => { mi.style.transform = ""; };
+
+  // Taille / quantité
+  const sz = $("#sizes");
+  if (sz) sz.onclick = (e) => { const b = e.target.closest(".size-opt"); if (!b) return; size = b.dataset.s; $$(".size-opt").forEach((x) => x.classList.toggle("on", x === b)); $("#size-err").classList.add("hidden"); };
+  $("#minus").onclick = () => { qty = Math.max(1, qty - 1); $("#qty").textContent = qty; };
+  $("#plus").onclick = () => { qty = Math.min(10, qty + 1); $("#qty").textContent = qty; };
+  const ok = () => { if (p.sizes && !size) { $("#size-err").classList.remove("hidden"); sz.scrollIntoView({ block: "center", behavior: "smooth" }); return false; } return true; };
+  if ($("#add")) { $("#add").onclick = () => { if (ok()) { Cart.add(p.id, size, qty); openCart(); } };
+  $("#buy").onclick = () => { if (ok()) { Cart.add(p.id, size, qty); location.href = "commande.html"; } }; }
+
+  // Suggestions
+  const rel = PRODUCTS.filter((x) => x.id !== p.id).sort((a, b) => (b.cat === p.cat) - (a.cat === p.cat)).slice(0, 4);
+  $("#more").innerHTML = rel.map((x) => productCard(x, "reveal")).join(""); watchReveal();
+});
+</script>
+</body>
+</html>

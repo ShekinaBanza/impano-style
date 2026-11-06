@@ -1,0 +1,6 @@
+# Médias d'origine à la racine (copies optimisées dans assets/)
+/*.jpg
+/*.mp4
+/.claude/
+.DS_Store
+Thumbs.db
