@@ -266,26 +266,55 @@
 
   /* ---------- COMPTE CLIENT (local à l'appareil) ---------- */
   const hashPw = async (s) => [...new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode("impano|" + s)))].map((b) => b.toString(16).padStart(2, "0")).join("");
+  const cacheUser = (u) => {
+    if (!u) { localStorage.removeItem("impano_acct"); return; }
+    const m = u.user_metadata || {};
+    localStorage.setItem("impano_acct", JSON.stringify({ id: u.id, email: u.email, name: m.name || u.email.split("@")[0], phone: m.phone || "" }));
+  };
   const Account = {
     users() { try { return JSON.parse(localStorage.getItem("impano_users") || "{}"); } catch (e) { return {}; } },
-    user() { const e = localStorage.getItem("impano_session"), u = this.users()[e]; return u ? { email: e, name: u.name, phone: u.phone } : null; },
+    user() {
+      if (window.sb) { try { return JSON.parse(localStorage.getItem("impano_acct") || "null"); } catch (e) { return null; } }
+      const e = localStorage.getItem("impano_session"), u = this.users()[e]; return u ? { email: e, name: u.name, phone: u.phone } : null;
+    },
     async signup({ name, email, phone, password }) {
-      email = email.trim().toLowerCase(); const us = this.users();
+      email = email.trim().toLowerCase();
+      if (window.sb) {
+        const { data, error } = await sb.auth.signUp({ email, password, options: { data: { name: name.trim(), phone: phone.trim() } } });
+        if (error) throw new Error(/registered|exists/i.test(error.message) ? "Un compte existe déjà avec cet email." : error.message);
+        if (!data.session) throw new Error("CONFIRM");
+        cacheUser(data.user); return;
+      }
+      const us = this.users();
       if (us[email]) throw new Error("Un compte existe déjà avec cet email.");
       us[email] = { name: name.trim(), phone: phone.trim(), hash: await hashPw(password) };
       localStorage.setItem("impano_users", JSON.stringify(us)); localStorage.setItem("impano_session", email);
     },
     async login(email, password) {
-      email = email.trim().toLowerCase(); const u = this.users()[email];
+      email = email.trim().toLowerCase();
+      if (window.sb) {
+        const { data, error } = await sb.auth.signInWithPassword({ email, password });
+        if (error) throw new Error(/confirm/i.test(error.message) ? "Confirmez d’abord votre email (lien reçu par mail)." : "Email ou mot de passe incorrect.");
+        cacheUser(data.user); return;
+      }
+      const u = this.users()[email];
       if (!u || u.hash !== (await hashPw(password))) throw new Error("Email ou mot de passe incorrect.");
       localStorage.setItem("impano_session", email);
     },
-    logout() { localStorage.removeItem("impano_session"); },
-    orders() {
+    async logout() { if (window.sb) { await sb.auth.signOut(); localStorage.removeItem("impano_acct"); } else localStorage.removeItem("impano_session"); },
+    async orders() {
+      if (window.sb) {
+        const { data } = await sb.from("orders").select("ref,created_at,total,items,status").order("created_at", { ascending: false });
+        return (data || []).map((o) => ({ ref: o.ref, date: o.created_at, total: o.total, items: o.items, status: o.status }));
+      }
       const e = (this.user() || {}).email;
       return JSON.parse(localStorage.getItem("impano_orders") || "[]").filter((o) => e && (o.account === e || (o.client && (o.client.email || "").toLowerCase() === e))).reverse();
     }
   };
+  if (window.sb) {
+    sb.auth.getSession().then(({ data }) => { cacheUser(data.session && data.session.user); acctButton(); });
+    sb.auth.onAuthStateChange((_e, s) => { cacheUser(s && s.user); acctButton(); });
+  }
   window.Account = Account;
 
   function acctButton() {
@@ -298,13 +327,16 @@
     const box = $("#acct-body"), u = Account.user();
     const field = (n, l, t = "text", extra = "") => `<label class="block"><span class="field-label">${l}</span><input name="${n}" type="${t}" ${extra} class="field"></label>`;
     if (u) {
-      const os = Account.orders();
       box.innerHTML = `<p class="eyebrow text-terra mb-3">Mon compte</p><h2 class="display text-4xl italic mb-1">Bonjour ${escH(u.name.split(" ")[0])}</h2>
         <p class="text-sm opacity-60 mb-8">${escH(u.email)}${u.phone ? " · " + escH(u.phone) : ""}</p>
         <h3 class="eyebrow mb-4">Mes commandes</h3>
-        <div class="space-y-3 mb-8 max-h-56 overflow-y-auto">${os.map((o) => `<div class="flex justify-between border-b border-ink/10 pb-3 text-sm"><span><b class="font-medium">${escH(o.ref)}</b><br><span class="opacity-55 text-xs">${new Date(o.date).toLocaleDateString("fr-FR")} · ${o.items.reduce((n, i) => n + i.qty, 0)} article(s)</span></span><span>${fmt(o.total)}</span></div>`).join("") || '<p class="text-sm opacity-55">Aucune commande pour le moment.</p>'}</div>
+        <div id="acct-orders" class="space-y-3 mb-8 max-h-56 overflow-y-auto"><p class="text-sm opacity-55">Chargement…</p></div>
         <div class="flex gap-3 flex-wrap"><a href="boutique" class="btn btn-ink !py-3">Continuer mes achats</a><button id="acct-out" class="btn btn-ghost !py-3">Se déconnecter</button></div>`;
-      $("#acct-out").onclick = () => { Account.logout(); acctButton(); acctView("login"); toast("À bientôt ✦"); document.dispatchEvent(new CustomEvent("accountchange")); };
+      $("#acct-out").onclick = async () => { await Account.logout(); acctButton(); acctView("login"); toast("À bientôt ✦"); document.dispatchEvent(new CustomEvent("accountchange")); };
+      Promise.resolve(Account.orders()).then((os) => {
+        const box2 = $("#acct-orders"); if (!box2) return;
+        box2.innerHTML = os.map((o) => `<div class="flex justify-between border-b border-ink/10 pb-3 text-sm"><span><b class="font-medium">${escH(o.ref)}</b>${o.status ? ` · <span class="text-terra">${escH(o.status)}</span>` : ""}<br><span class="opacity-55 text-xs">${new Date(o.date).toLocaleDateString("fr-FR")} · ${o.items.reduce((n, i) => n + i.qty, 0)} article(s)</span></span><span>${fmt(o.total)}</span></div>`).join("") || '<p class="text-sm opacity-55">Aucune commande pour le moment.</p>';
+      }).catch(() => { const b2 = $("#acct-orders"); if (b2) b2.innerHTML = '<p class="text-sm opacity-55">Impossible de charger vos commandes.</p>'; });
       return;
     }
     const signup = view === "signup";
@@ -331,7 +363,7 @@
         if (signup) await Account.signup({ name: f.name.value, email: f.email.value, phone: f.phone.value, password: f.password.value });
         else await Account.login(f.email.value, f.password.value);
         acctButton(); acctView(); toast("Connecté ✦"); document.dispatchEvent(new CustomEvent("accountchange"));
-      } catch (er) { err.textContent = er.message; }
+      } catch (er) { if (er.message === "CONFIRM") { box.innerHTML = `<p class="eyebrow text-terra mb-3">Presque fini</p><h2 class="display text-4xl italic mb-4">Vérifiez vos mails</h2><p class="opacity-70 leading-relaxed">Nous avons envoyé un lien de confirmation à votre adresse. Cliquez dessus, puis revenez vous connecter.</p>`; } else err.textContent = er.message; }
     };
   }
   window.openAccount = (v) => { acctView(v); $("#acct").classList.remove("hidden"); document.body.style.overflow = "hidden"; };
@@ -398,6 +430,24 @@
     acctButton();
   }
 
+
+  /* ---------- CATALOGUE EN LIGNE (Supabase) : copie locale rafraîchie à chaque visite ---------- */
+  async function refreshRemote() {
+    if (!window.sb) return;
+    try {
+      const { data, error } = await sb.from("site_data").select("key,value,updated_at");
+      if (error || !data || !data.length) return;
+      const o = {}; let up = "";
+      data.forEach((r) => { o[r.key] = r.value; if (r.updated_at > up) up = r.updated_at; });
+      const next = JSON.stringify({ products: o.products, content: o.content, config: o.config, updated: up });
+      if (next !== localStorage.getItem("impano_remote")) {
+        localStorage.setItem("impano_remote", next);
+        if (!sessionStorage.getItem("impano_rl")) { sessionStorage.setItem("impano_rl", "1"); location.reload(); }   // une seule fois par visite
+      }
+    } catch (e) { /* hors-ligne : on garde la copie locale */ }
+  }
+  window.refreshRemote = refreshRemote;
+
   /* ---------- INVITE D'INSTALLATION PWA ---------- */
   let deferred = null;
   const standalone = () => matchMedia("(display-mode: standalone)").matches || navigator.standalone;
@@ -449,6 +499,6 @@
     $$("video[data-auto]").forEach((v) => vo.observe(v));
   }
 
-  document.addEventListener("DOMContentLoaded", () => { chrome(); extras(); applyCms(); observers(); });
+  document.addEventListener("DOMContentLoaded", () => { chrome(); extras(); applyCms(); observers(); if (!document.body.hasAttribute("data-admin")) setTimeout(refreshRemote, 300); });
   if ("serviceWorker" in navigator && location.protocol !== "file:") addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));
 })();

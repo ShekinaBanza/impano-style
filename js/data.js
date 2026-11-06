@@ -200,12 +200,13 @@ const DEFAULT_PRODUCTS = [
 (function () {
   const read = (k) => { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } };
   const SITE = window.SITE || {};
-  const cfg = read("impano_config") || SITE.config;
+  const REMOTE = read("impano_remote") || {};            // dernière copie reçue de Supabase
+  const cfg = read("impano_config") || REMOTE.config || SITE.config;
   if (cfg) Object.assign(CONFIG, cfg, { shipping: Object.assign({}, CONFIG.shipping, cfg.shipping || {}) });
   window.DEFAULT_PRODUCTS = DEFAULT_PRODUCTS;
-  window.ALL_PRODUCTS = read("impano_products") || SITE.products || DEFAULT_PRODUCTS;   // tout (pour l'admin)
+  window.ALL_PRODUCTS = read("impano_products") || REMOTE.products || SITE.products || DEFAULT_PRODUCTS;   // tout (pour l'admin)
   window.PRODUCTS = window.ALL_PRODUCTS.filter((p) => !p.hidden);                       // visible en boutique
-  window.CONTENT = read("impano_content") || SITE.content || {};                        // textes, images, vidéos
+  window.CONTENT = read("impano_content") || REMOTE.content || SITE.content || {};                        // textes, images, vidéos
   // Catégories éditables
   CATEGORIES.forEach((c) => {
     ["label", "short", "blurb", "img"].forEach((f) => { const v = CONTENT[`cat.${c.id}.${f}`]; if (v) c[f] = v; });

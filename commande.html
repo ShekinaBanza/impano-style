@@ -93,9 +93,10 @@
       <p class="eyebrow text-terra mb-4">Commande enregistrée</p>
       <h2 class="display text-5xl md:text-7xl italic mb-6">Merci <span id="d-name"></span></h2>
       <p class="opacity-75 leading-relaxed mb-3">Votre numéro de commande : <b id="d-ref" class="font-medium"></b></p>
-      <p class="opacity-75 leading-relaxed mb-10">Dernière étape : envoyez-nous le récapitulatif sur WhatsApp pour que nous confirmions la disponibilité et le paiement.</p>
+      <p id="d-wa-note" class="opacity-75 leading-relaxed mb-3"></p>
+      <p id="d-save" class="text-sm text-terra mb-10 min-h-[1.25rem]"></p>
       <div class="flex flex-col sm:flex-row gap-4 justify-center">
-        <a id="d-wa" target="_blank" rel="noopener" class="btn btn-ink">Envoyer sur WhatsApp</a>
+        <a id="d-wa" target="_blank" rel="noopener" class="btn btn-ink">Rouvrir WhatsApp</a>
         <a href="boutique" class="btn btn-ghost">Retour à la boutique</a>
       </div>
     </div>
@@ -103,6 +104,8 @@
 </main>
 
 <div id="footer"></div>
+<script src="js/config.js"></script>
+<script src="js/sb.js"></script>
 <script src="data/site.js"></script>
 <script src="js/data.js"></script>
 <script src="js/app.js"></script>
@@ -146,7 +149,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const orig = Cart.save.bind(Cart); Cart.save = function () { orig(); show(); };
   show();
 
-  form.addEventListener("submit", (e) => {
+  form.addEventListener("submit", async (e) => {
     e.preventDefault();
     const f = new FormData(form), g = (k) => (f.get(k) || "").toString().trim();
     const retrait = g("mode") === "retrait";
@@ -165,13 +168,34 @@ document.addEventListener("DOMContentLoaded", () => {
     const lines = Cart.items.map((it) => { const p = byId(it.id); return `• ${it.qty} × ${p.name}${it.size ? " (taille " + it.size + ")" : ""} — ${fmt(p.price * it.qty)}`; }).join("\n");
     const msg = `Bonjour Impano 👋\nNouvelle commande *${ref}*\n\n${lines}\n\nSous-total : ${fmt(Cart.subtotal())}\nLivraison : ${s ? fmt(s) : "offerte"}\n*Total : ${fmt(total)}*\n\n👤 ${g("prenom")} ${g("nom")}\n📞 ${g("tel")}\n📍 ${retrait ? "Retrait à l’atelier" : `${g("adresse")}, ${g("quartier")}, ${g("ville")}`}\n💳 ${g("pay")}${g("note") ? "\n📝 " + g("note") : ""}`;
 
-    const orders = JSON.parse(localStorage.getItem("impano_orders") || "[]");
-    orders.push({ ref, date: new Date().toISOString(), total, items: Cart.items, account: (Account.user() || {}).email || null, client: { prenom: g("prenom"), nom: g("nom"), tel: g("tel"), email: g("email") } });
+    const waUrl = `https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(msg)}`;
+    const win = window.open(waUrl, "_blank");               // ouvre WhatsApp tout de suite avec TOUT le panier (geste utilisateur)
+
+    const row = {
+      ref, user_id: (Account.user() || {}).id || null,
+      client: { prenom: g("prenom"), nom: g("nom"), tel: g("tel"), email: g("email"), adresse: retrait ? "Retrait à l’atelier" : `${g("adresse")}, ${g("quartier")}, ${g("ville")}` },
+      items: Cart.items.map((it) => { const p = byId(it.id); return { id: it.id, name: p.name, size: it.size, qty: it.qty, price: p.price }; }),
+      total, shipping: s, delivery: g("mode"), payment: g("pay"), note: g("note") || null
+    };
+    const orders = JSON.parse(localStorage.getItem("impano_orders") || "[]");   // copie de secours sur l’appareil
+    orders.push({ ref, date: new Date().toISOString(), total, items: row.items, account: (Account.user() || {}).email || null, client: row.client });
     localStorage.setItem("impano_orders", JSON.stringify(orders));
 
     $("#d-name").textContent = g("prenom"); $("#d-ref").textContent = ref;
-    $("#d-wa").href = `https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(msg)}`;
+    $("#d-wa").href = waUrl;
+    $("#d-wa-note").textContent = win ? "WhatsApp s’est ouvert avec le détail de votre commande. Si besoin, rouvrez-le avec le bouton ci-dessous." : "Appuyez sur le bouton ci-dessous pour envoyer votre commande sur WhatsApp.";
     form.classList.add("hidden"); $("#done").classList.remove("hidden");
+
+    // Enregistrement sécurisé dans la base (Supabase)
+    const st = $("#d-save");
+    if (window.sb) {
+      st.textContent = "Enregistrement de la commande…";
+      try {
+        const { error } = await sb.from("orders").insert(row);
+        if (error) throw error;
+        st.textContent = "✓ Commande enregistrée chez Impano.";
+      } catch (er) { st.textContent = "Commande transmise par WhatsApp (enregistrement en ligne indisponible)."; console.warn(er); }
+    }
     Cart.items = []; localStorage.setItem("impano_cart_v1", "[]"); Cart.render();
     scrollTo({ top: 0, behavior: "smooth" });
   });

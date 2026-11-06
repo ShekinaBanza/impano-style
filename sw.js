@@ -1,8 +1,8 @@
 /* Impano — service worker : adresses propres + mode hors-ligne pour les pages et images vues */
-const VERSION = "impano-v4";
+const VERSION = "impano-v5";
 const ROOT = new URL("./", self.registration.scope).pathname;           // ex. /impano-style/
 const CORE = ["./", "index.html", "boutique.html", "produit.html", "commande.html", "histoire.html", "admin.html",
-  "css/style.css", "js/app.js", "js/data.js", "js/tw-config.js", "data/site.js", "manifest.webmanifest",
+  "css/style.css", "js/app.js", "js/data.js", "js/config.js", "js/sb.js", "js/tw-config.js", "data/site.js", "manifest.webmanifest",
   "icons/icon-192.png", "icons/icon-512.png"];
 
 /* /boutique/sacs -> boutique.html ; /produit/<id> -> produit.html ; /histoire -> histoire.html ; / -> index.html */

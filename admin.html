@@ -15,17 +15,18 @@
   <link rel="stylesheet" href="css/style.css">
   <style> body::after{display:none} .tab.on{border-bottom:2px solid #B4521E;opacity:1} .tab{opacity:.5;border-bottom:2px solid transparent} </style>
 </head>
-<body class="bg-ivory">
+<body class="bg-ivory" data-admin>
 
 <!-- ============ CONNEXION ============ -->
 <section id="login" class="min-h-screen grid place-items-center px-5 bg-ink text-cowrie">
   <form id="login-form" class="w-full max-w-sm text-center">
     <span class="logo text-6xl block mb-3">impano</span>
     <p class="logo-tag text-[.6rem] opacity-60 mb-12">Espace administration</p>
+    <input id="em" type="email" placeholder="Email administrateur" autocomplete="username" class="field text-center !border-cowrie/40 text-cowrie placeholder:text-cowrie/40 mb-4 hidden">
     <input id="pw" type="password" placeholder="Mot de passe" autocomplete="current-password" class="field text-center !border-cowrie/40 text-cowrie placeholder:text-cowrie/40">
     <p id="login-err" class="text-ember text-sm mt-4 h-5"></p>
     <button class="btn btn-light w-full mt-6">Entrer</button>
-    <p id="first" class="text-xs opacity-50 mt-8 hidden">Premier accès : le mot de passe par défaut est <b>impano2025</b>. Changez-le dans « Paramètres ».</p>
+    <p id="first" class="text-xs opacity-50 mt-8 hidden"></p>
   </form>
 </section>
 
@@ -73,8 +74,7 @@
 
     <!-- Commandes -->
     <section id="t-orders" class="hidden">
-      <h1 class="display text-5xl italic mb-2">Commandes</h1>
-      <p class="text-sm opacity-60 mb-8">Les commandes enregistrées sur <b>cet appareil</b>. Les commandes de vos clients vous arrivent sur WhatsApp.</p>
+      <div class="flex flex-wrap items-end justify-between gap-4 mb-8"><div><h1 class="display text-5xl italic mb-2">Commandes</h1><p class="text-sm opacity-60">Chaque commande est aussi envoyée sur WhatsApp. Changez son statut au fil du traitement.</p></div><button id="orefresh" class="btn btn-ghost !py-3">Actualiser</button></div>
       <div id="olist" class="space-y-4"></div>
     </section>
 
@@ -107,12 +107,12 @@
     <!-- Publier -->
     <section id="t-publish" class="hidden max-w-2xl">
       <h1 class="display text-5xl italic mb-3">Publier</h1>
-      <p class="text-sm opacity-70 leading-relaxed mb-10">Vos modifications sont d’abord des <b>brouillons</b> visibles seulement ici. « Publier » les envoie sur GitHub : le site public est mis à jour pour tous vos clients en 1 à 2 minutes.</p>
+      <p class="text-sm opacity-70 leading-relaxed mb-10">Vos modifications sont d’abord des <b>brouillons</b> visibles seulement ici. « Publier » les enregistre en ligne pour tous vos clients.</p>
 
       <div id="pub-status" class="border border-ink/15 p-6 mb-10 flex items-center justify-between gap-4"><div><p class="eyebrow opacity-60">État</p><p id="pub-state" class="display text-2xl"></p></div><button id="pub-go" class="btn btn-ink">Publier maintenant</button></div>
       <pre id="plog" class="hidden bg-ink text-cowrie text-xs p-5 mb-10 whitespace-pre-wrap max-h-64 overflow-y-auto"></pre>
 
-      <h2 class="display text-3xl italic mb-4">Connexion GitHub</h2>
+      <div id="gh-block"><h2 class="display text-3xl italic mb-4">Connexion GitHub</h2>
       <form id="ghform" class="space-y-6">
         <div class="grid grid-cols-2 gap-8">
           <label class="block"><span class="field-label">Compte</span><input name="owner" class="field"></label>
@@ -129,7 +129,8 @@
           <li>Copiez le jeton (commence par <code>github_pat_</code>) et collez-le ci-dessus.</li>
         </ol>
         <p class="mt-4 text-terra">Le jeton reste sur cet appareil. Ne le partagez jamais et utilisez un jeton limité à ce seul dépôt.</p>
-      </details>
+      </details></div>
+      <div id="sb-block" class="hidden border border-ink/15 p-6"><p class="eyebrow text-terra mb-2">Stockage sécurisé</p><p class="display text-2xl mb-2">Base de données Supabase connectée ✓</p><p class="text-sm opacity-70 leading-relaxed">Articles, textes, photos, vidéos et commandes sont enregistrés dans votre base. « Publier » met le site à jour <b>immédiatement</b> pour tous les visiteurs, sans GitHub.</p></div>
     </section>
   </main>
 </div>
@@ -169,6 +170,8 @@
 
 <div id="toast" class="fixed bottom-8 left-1/2 -translate-x-1/2 z-[120] bg-ink text-ivory text-sm px-6 py-3.5 opacity-0 translate-y-6 pointer-events-none transition-all duration-500"></div>
 
+<script src="js/config.js"></script>
+<script src="js/sb.js"></script>
 <script src="data/site.js"></script>
 <script src="js/data.js"></script>
 <script>
@@ -178,10 +181,28 @@ const sha = async (s) => [...new Uint8Array(await crypto.subtle.digest("SHA-256"
 const esc = (s = "") => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 
 /* ---------- Connexion ---------- */
+const isAdmin = async () => { if (!window.sb) return false; const { data, error } = await sb.rpc("is_admin"); return !error && data === true; };
 (async () => {
-  const stored = localStorage.getItem("impano_admin_pw");
-  if (!stored) $("#first").classList.remove("hidden");
+  const useSB = !!window.sb, first = $("#first");
   const enter = () => { $("#login").classList.add("hidden"); $("#app").classList.remove("hidden"); setTimeout(init, 0); };
+  if (useSB) {
+    $("#em").classList.remove("hidden");
+    first.classList.remove("hidden"); first.textContent = "Connexion sécurisée au compte administrateur.";
+    const { data } = await sb.auth.getSession();
+    if (data.session && (await isAdmin())) return enter();
+    $("#login-form").onsubmit = async (e) => {
+      e.preventDefault(); const err = $("#login-err"); err.textContent = "Connexion…";
+      const { error } = await sb.auth.signInWithPassword({ email: $("#em").value.trim(), password: $("#pw").value });
+      if (error) { err.textContent = "Email ou mot de passe incorrect."; return; }
+      if (!(await isAdmin())) { await sb.auth.signOut(); err.textContent = "Ce compte n’a pas les droits administrateur."; return; }
+      enter();
+    };
+    return;
+  }
+  // Mode local (Supabase non configuré)
+  const stored = localStorage.getItem("impano_admin_pw");
+  first.classList.remove("hidden");
+  first.innerHTML = "⚠ Base de données non configurée : mode local. " + (stored ? "" : "Mot de passe par défaut : <b>impano2025</b>. ") + "Voir SETUP-SUPABASE.md pour activer le stockage sécurisé.";
   if (sessionStorage.getItem("impano_admin") === "1") return enter();
   $("#login-form").onsubmit = async (e) => {
     e.preventDefault();
@@ -189,7 +210,7 @@ const esc = (s = "") => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<"
     if (h === ref) { sessionStorage.setItem("impano_admin", "1"); enter(); } else $("#login-err").textContent = "Mot de passe incorrect.";
   };
 })();
-$("#logout").onclick = () => { sessionStorage.removeItem("impano_admin"); location.reload(); };
+$("#logout").onclick = async () => { sessionStorage.removeItem("impano_admin"); if (window.sb) await sb.auth.signOut(); location.reload(); };
 
 /* ---------- Données ---------- */
 let list = JSON.parse(JSON.stringify(ALL_PRODUCTS));
@@ -312,17 +333,45 @@ $("#m-del").onclick = () => {
 };
 
 /* ---------- Commandes ---------- */
-function drawOrders() {
-  const os = JSON.parse(localStorage.getItem("impano_orders") || "[]").reverse();
-  $("#oc").textContent = os.length || ""; $("#oc").classList.toggle("hidden", !os.length);
-  $("#olist").innerHTML = os.map((o) => `
-    <div class="bg-white border border-ink/10 p-6 grid md:grid-cols-12 gap-4">
-      <div class="md:col-span-3"><p class="display text-2xl">${esc(o.ref)}</p><p class="text-xs opacity-60">${new Date(o.date).toLocaleString("fr-FR")}</p></div>
-      <div class="md:col-span-5 text-sm">${o.items.map((i) => { const p = ALL_PRODUCTS.find((x) => x.id === i.id); return `<p>${i.qty} × ${esc(p ? p.name : i.id)}${i.size ? " (" + i.size + ")" : ""}</p>`; }).join("")}</div>
-      <div class="md:col-span-3 text-sm"><p>${esc(o.client.prenom)} ${esc(o.client.nom)}</p><a class="ulink text-terra" target="_blank" href="https://wa.me/${o.client.tel.replace(/\D/g, "")}">${esc(o.client.tel)}</a></div>
-      <div class="md:col-span-1 text-right display text-2xl">${CONFIG.currency}${o.total}</div>
-    </div>`).join("") || '<p class="opacity-60">Aucune commande enregistrée sur cet appareil pour le moment.</p>';
+const STATUSES = ["nouveau", "confirmé", "payé", "expédié", "livré", "annulé"];
+let ORDERS = [];
+async function drawOrders() {
+  if (window.sb) {
+    const { data, error } = await sb.from("orders").select("*").order("created_at", { ascending: false }).limit(300);
+    if (error) { $("#olist").innerHTML = `<p class="text-terra">Impossible de charger les commandes : ${esc(error.message)}</p>`; return; }
+    ORDERS = data;
+  } else {
+    ORDERS = JSON.parse(localStorage.getItem("impano_orders") || "[]").reverse().map((o) => ({ id: null, ref: o.ref, created_at: o.date, total: o.total, items: o.items.map((i) => { const p = ALL_PRODUCTS.find((x) => x.id === i.id); return { ...i, name: i.name || (p ? p.name : i.id) }; }), client: o.client, status: null }));
+  }
+  const n = ORDERS.filter((o) => o.status === "nouveau").length || (window.sb ? 0 : ORDERS.length);
+  $("#oc").textContent = n || ""; $("#oc").classList.toggle("hidden", !n);
+  $("#olist").innerHTML = ORDERS.map((o) => {
+    const c = o.client || {};
+    return `<div class="bg-white border border-ink/10 p-6 grid md:grid-cols-12 gap-5 ${o.status === "annulé" ? "opacity-55" : ""}">
+      <div class="md:col-span-3"><p class="display text-2xl">${esc(o.ref)}</p><p class="text-xs opacity-60">${new Date(o.created_at).toLocaleString("fr-FR")}</p>
+        ${o.status ? `<select data-ost="${o.id}" class="mt-3 border border-ink/25 bg-transparent px-2 py-1.5 text-sm ${o.status === "nouveau" ? "!border-terra text-terra" : ""}">${STATUSES.map((st) => `<option ${st === o.status ? "selected" : ""}>${st}</option>`).join("")}</select>` : ""}</div>
+      <div class="md:col-span-4 text-sm space-y-1">${(o.items || []).map((i) => `<p>${i.qty} × ${esc(i.name || i.id)}${i.size ? " (" + esc(i.size) + ")" : ""}${i.price ? ` — ${CONFIG.currency}${i.price * i.qty}` : ""}</p>`).join("")}
+        ${o.shipping ? `<p class="opacity-60">Livraison : ${CONFIG.currency}${o.shipping}</p>` : ""}</div>
+      <div class="md:col-span-3 text-sm space-y-1"><p class="font-medium">${esc(c.prenom || "")} ${esc(c.nom || "")}</p>
+        <a class="ulink text-terra" target="_blank" href="https://wa.me/${String(c.tel || "").replace(/\D/g, "")}">${esc(c.tel || "")}</a>
+        ${c.adresse ? `<p class="opacity-70">${esc(c.adresse)}</p>` : ""}${o.payment ? `<p class="opacity-70">💳 ${esc(o.payment)}</p>` : ""}${o.note ? `<p class="opacity-70 italic">« ${esc(o.note)} »</p>` : ""}</div>
+      <div class="md:col-span-2 text-right"><p class="display text-3xl">${CONFIG.currency}${o.total}</p>${o.id ? `<button data-odel="${o.id}" class="eyebrow !text-[.58rem] opacity-50 hover:opacity-100 mt-3">Supprimer</button>` : ""}</div>
+    </div>`;
+  }).join("") || '<p class="opacity-60">Aucune commande pour le moment.</p>';
 }
+$("#olist").addEventListener("change", async (e) => {
+  const sel = e.target.closest("[data-ost]"); if (!sel) return;
+  const { error } = await sb.from("orders").update({ status: sel.value }).eq("id", sel.dataset.ost);
+  if (error) alert("Erreur : " + error.message); else say("Statut mis à jour ✦");
+  drawOrders();
+});
+$("#olist").addEventListener("click", async (e) => {
+  const d = e.target.closest("[data-odel]"); if (!d || !confirm("Supprimer définitivement cette commande ?")) return;
+  const { error } = await sb.from("orders").delete().eq("id", d.dataset.odel);
+  if (error) alert("Erreur : " + error.message); else { say("Commande supprimée"); drawOrders(); }
+});
+$("#orefresh").onclick = () => { drawOrders(); say("Actualisé"); };
+setInterval(() => { if (window.sb && !$("#t-orders").classList.contains("hidden") && !document.hidden) drawOrders(); }, 60000);
 
 /* ---------- Paramètres & sauvegarde ---------- */
 function fillSettings() {
@@ -334,7 +383,12 @@ $("#sform").onsubmit = async (e) => {
   e.preventDefault(); const F = e.target;
   const cfg = { whatsapp: F.whatsapp.value.replace(/\D/g, ""), currency: F.currency.value || "$", freeShippingFrom: +F.free.value || 0, shipping: { lubumbashi: +F.lubum.value || 0, autre: +F.autre.value || 0 } };
   localStorage.setItem("impano_config", JSON.stringify(cfg)); Object.assign(CONFIG, cfg); markDirty();
-  if (F.newpw.value) { if (F.newpw.value.length < 6) return alert("Mot de passe : 6 caractères minimum."); localStorage.setItem("impano_admin_pw", await sha(F.newpw.value)); F.newpw.value = ""; }
+  if (F.newpw.value) {
+    if (F.newpw.value.length < 8) return alert("Mot de passe : 8 caractères minimum.");
+    if (window.sb) { const { error } = await sb.auth.updateUser({ password: F.newpw.value }); if (error) return alert("Erreur : " + error.message); }
+    else localStorage.setItem("impano_admin_pw", await sha(F.newpw.value));
+    F.newpw.value = ""; say("Mot de passe modifié ✦");
+  }
   say("Paramètres enregistrés ✦");
 };
 $("#export").onclick = () => {
@@ -372,7 +426,18 @@ function saveContent() {
 }
 
 /* Si une version plus récente a été publiée depuis un autre appareil et qu'il n'y a pas de brouillon, on l'adopte */
+async function syncRemote() {
+  if (!window.sb || isDirty() || sessionStorage.getItem("impano_synced")) return;
+  const { data } = await sb.from("site_data").select("key,value,updated_at"); if (!data || !data.length) return;
+  const o = {}; let up = ""; data.forEach((r) => { o[r.key] = r.value; if (r.updated_at > up) up = r.updated_at; });
+  if (up > (localStorage.getItem("impano_base") || "")) {
+    localStorage.setItem("impano_remote", JSON.stringify({ products: o.products, content: o.content, config: o.config, updated: up }));
+    ["impano_products", "impano_content", "impano_config"].forEach((k) => localStorage.removeItem(k));
+    localStorage.setItem("impano_base", up); sessionStorage.setItem("impano_synced", "1"); location.reload();
+  }
+}
 function syncPublished() {
+  if (window.sb) { syncRemote(); return; }
   const pub = (window.SITE || {}).published, base = localStorage.getItem("impano_base") || "";
   if (pub && pub > base && !isDirty() && !sessionStorage.getItem("impano_synced")) {
     ["impano_products", "impano_content", "impano_config"].forEach((k) => localStorage.removeItem(k));
@@ -431,7 +496,7 @@ async function drawContent() {
     const lab = f.label.split(" › ").slice(1).join(" › ") || f.label, over = content[f.key] ? " · <span class='text-terra'>modifié</span>" : "";
     const head = `<div class="flex justify-between items-baseline mb-2"><span class="field-label">${esc(lab)}${over}</span>${content[f.key] ? `<button data-reset="${f.key}" class="eyebrow !text-[.58rem] ulink opacity-60">Rétablir</button>` : ""}</div>`;
     if (f.type === "image") return `<div class="bg-white border border-ink/10 p-4">${head}<div class="flex gap-4 items-center"><img src="${esc(val(f))}" class="w-24 h-28 object-cover bg-bone" alt=""><label class="btn btn-ghost !py-2.5 !px-4 !text-[.62rem] cursor-pointer">Changer la photo<input type="file" accept="image/*" data-img="${f.key}" class="hidden"></label></div></div>`;
-    if (f.type === "video") return `<div class="bg-white border border-ink/10 p-4">${head}<div class="flex gap-4 items-start"><video src="${esc(val(f))}" muted controls playsinline preload="metadata" class="w-28 h-40 object-cover bg-ink"></video><div class="flex-1 space-y-3"><label class="btn btn-ghost !py-2.5 !px-4 !text-[.62rem] cursor-pointer">Téléverser une vidéo<input type="file" accept="video/mp4,video/webm" data-vid="${f.key}" class="hidden"></label><p class="text-xs opacity-55 leading-snug">MP4 de 40 Mo maximum (compressez-la avant). Nécessite le jeton GitHub.</p><p data-vstat="${f.key}" class="text-xs text-terra"></p></div></div></div>`;
+    if (f.type === "video") return `<div class="bg-white border border-ink/10 p-4">${head}<div class="flex gap-4 items-start"><video src="${esc(val(f))}" muted controls playsinline preload="metadata" class="w-28 h-40 object-cover bg-ink"></video><div class="flex-1 space-y-3"><label class="btn btn-ghost !py-2.5 !px-4 !text-[.62rem] cursor-pointer">Téléverser une vidéo<input type="file" accept="video/mp4,video/webm" data-vid="${f.key}" class="hidden"></label><p class="text-xs opacity-55 leading-snug">MP4 de 40 Mo maximum (compressez-la avant).</p><p data-vstat="${f.key}" class="text-xs text-terra"></p></div></div></div>`;
     const long = f.def.length > 70 || f.def.includes("\n");
     return `<div class="bg-white border border-ink/10 p-4">${head}${long ? `<textarea data-txt="${f.key}" rows="${Math.min(7, Math.max(2, Math.ceil(f.def.length / 60)))}" class="field resize-y !pt-1">${esc(val(f))}</textarea>` : `<input data-txt="${f.key}" value="${esc(val(f))}" class="field !pt-1">`}</div>`;
   };
@@ -462,12 +527,13 @@ $("#clist").addEventListener("change", async (e) => {
   if (vd && vd.files[0]) {
     const file = vd.files[0], st = $(`[data-vstat="${vd.dataset.vid}"]`);
     if (file.size > 40 * 1048576) { st.textContent = "Vidéo trop lourde (40 Mo max)."; return; }
-    if (!gh().token) { st.textContent = "Ajoutez d’abord le jeton GitHub (onglet Publier)."; return; }
+    if (!window.sb && !gh().token) { st.textContent = "Configurez Supabase (ou le jeton GitHub, onglet Publier) pour téléverser une vidéo."; return; }
     try {
       st.textContent = "Envoi en cours… (peut prendre une minute)";
-      const path = `assets/uploads/${Date.now().toString(36)}-${file.name.replace(/[^a-z0-9.]+/gi, "-").toLowerCase()}`;
-      await ghPut(path, await fileToB64(file), "Admin : vidéo");
-      content[vd.dataset.vid] = path; saveContent(); drawContent(); say("Vidéo envoyée ✦ (visible après publication)");
+      const clean = `${Date.now().toString(36)}-${file.name.replace(/[^a-z0-9.]+/gi, "-").toLowerCase()}`;
+      if (window.sb) content[vd.dataset.vid] = await sbUpload(`video/${clean}`, file, file.type);
+      else { const path = `assets/uploads/${clean}`; await ghPut(path, await fileToB64(file), "Admin : vidéo"); content[vd.dataset.vid] = path; }
+      saveContent(); drawContent(); say("Vidéo envoyée ✦ (visible après publication)");
     } catch (er) { st.textContent = er.message; }
   }
 });
@@ -476,6 +542,7 @@ $("#clist").addEventListener("change", async (e) => {
 function drawPublish() {
   const c = gh(), F = $("#ghform");
   if (document.activeElement.form !== F) { F.owner.value = c.owner; F.repo.value = c.repo; F.token.value = c.token; }
+  $("#gh-block").classList.toggle("hidden", !!window.sb); $("#sb-block").classList.toggle("hidden", !window.sb);
   const d = isDirty();
   $("#pub-state").innerHTML = d ? '<span class="text-terra">Modifications non publiées</span>' : "Tout est publié ✦";
   $("#pub-go").disabled = !d; $("#pub-go").classList.toggle("opacity-40", !d);
@@ -493,10 +560,38 @@ $("#gh-test").onclick = async () => {
     const j = await r.json(); say(j.permissions && j.permissions.push ? "Connexion OK — écriture autorisée ✦" : "Connecté, mais le jeton n’a pas le droit d’écrire.");
   } catch (er) { alert(er.message); }
 };
+/* Envoi d'un fichier dans le stockage Supabase (bucket « media ») et URL publique */
+async function sbUpload(path, blobOrFile, type) {
+  const { error } = await sb.storage.from("media").upload(path, blobOrFile, { contentType: type || "application/octet-stream", upsert: true });
+  if (error) throw new Error("Stockage : " + error.message);
+  return sb.storage.from("media").getPublicUrl(path).data.publicUrl;
+}
+async function publishSB(L) {
+  const map = new Map();
+  const up = async (d) => {
+    if (!d || typeof d !== "string" || !d.startsWith("data:")) return d;
+    if (map.has(d)) return map.get(d);
+    const blob = await (await fetch(d)).blob(), ext = blob.type.includes("png") ? "png" : "jpg", path = `img/${(await sha(d)).slice(0, 14)}.${ext}`;
+    L("↑ " + path); const url = await sbUpload(path, blob, blob.type); map.set(d, url); return url;
+  };
+  const prods = JSON.parse(JSON.stringify(list));
+  for (const p of prods) { p.img = await up(p.img); for (let i = 0; i < (p.gallery || []).length; i++) p.gallery[i] = await up(p.gallery[i]); }
+  const cont = { ...content }; for (const k of Object.keys(cont)) cont[k] = await up(cont[k]);
+  const cfg = JSON.parse(localStorage.getItem("impano_config") || "null");
+  const now = new Date().toISOString(), rows = [{ key: "products", value: prods, updated_at: now }, { key: "content", value: cont, updated_at: now }];
+  if (cfg) rows.push({ key: "config", value: cfg, updated_at: now });
+  L("↑ base de données"); const { error } = await sb.from("site_data").upsert(rows);
+  if (error) throw new Error("Base : " + error.message);
+  list = prods; content = cont; persist(); saveContent();
+  localStorage.setItem("impano_remote", JSON.stringify({ products: prods, content: cont, config: cfg || undefined, updated: now }));
+  localStorage.setItem("impano_base", now); localStorage.removeItem("impano_dirty");
+  L("\n✔ Publié : visible immédiatement par tous vos clients.");
+}
 $("#pub-go").onclick = async () => {
   const log = $("#plog"); log.classList.remove("hidden"); log.textContent = ""; const L = (m) => { log.textContent += m + "\n"; log.scrollTop = log.scrollHeight; };
   $("#pub-go").disabled = true;
   try {
+    if (window.sb) { await publishSB(L); drawList(); drawDirty(); say("Publié ✦"); drawPublish(); return; }
     const map = new Map();
     const up = async (d) => {
       if (!d || typeof d !== "string" || !d.startsWith("data:")) return d;
