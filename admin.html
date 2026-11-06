@@ -227,7 +227,7 @@ $("#imgs").addEventListener("click", (e) => {
   if (m) imgs.unshift(imgs.splice(+m.dataset.main, 1)[0]);
   drawImgs();
 });
-function shrink(file, max = 900, q = 0.74) {
+function shrink(file, max = 1200, q = 0.82) {
   return new Promise((res, rej) => {
     const fr = new FileReader();
     fr.onerror = rej;

@@ -98,3 +98,8 @@ body::after {
 .logo { font-family: "Syne", "Montserrat", sans-serif; font-weight: 800; letter-spacing: -.075em; text-transform: lowercase; line-height: .85; display: inline-block; position: relative; padding-right: .22em; }
 .logo::after { content: "©"; position: absolute; right: 0; top: .08em; font-size: .17em; font-weight: 600; letter-spacing: 0; line-height: 1; border: 0; }
 .logo-tag { font-family: "Syne", sans-serif; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; }
+
+/* Logo géant de l'accueil : toujours entièrement visible */
+.logo-hero { font-size: min(calc((100vw - 2.5rem) / 6.1), 20rem); text-shadow: 0 2px 40px rgba(0,0,0,.25); }
+#header.on-hero:not(.solid) .hlogo { opacity: 0; pointer-events: none; }
+.hlogo { transition: opacity .5s; }

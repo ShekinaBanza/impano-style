@@ -116,7 +116,7 @@
           ${NAV.slice(0, 4).map(([h, l]) => `<a href="${h}" class="ulink ${cur === h ? "active" : ""}">${l}</a>`).join("")}
         </nav>
         <button id="burger" class="lg:hidden justify-self-start eyebrow flex items-center gap-3" aria-label="Menu"><span class="block w-6 h-px bg-current relative before:absolute before:-top-1.5 before:w-6 before:h-px before:bg-current after:absolute after:top-1.5 after:w-4 after:h-px after:bg-current"></span></button>
-        <a href="index.html" class="justify-self-center text-center leading-none" aria-label="Impano — accueil">
+        <a href="index.html" class="hlogo justify-self-center text-center leading-none" aria-label="Impano — accueil">
           <span class="logo text-[2.1rem] md:text-[2.6rem] block">impano</span>
           <span class="logo-tag block text-[.45rem] mt-1.5 opacity-70">Wear the gift · Be the gift</span>
         </a>
@@ -176,7 +176,7 @@
           <div class="lg:col-span-2"><p class="eyebrow opacity-50 mb-6">Maison</p><ul class="space-y-3 text-sm">
             <li><a class="ulink" href="histoire.html">Notre histoire</a></li><li><a class="ulink" href="histoire.html#cauris">Le langage des cauris</a></li><li><a class="ulink" href="histoire.html#atelier">L’atelier</a></li><li><a class="ulink" href="commande.html">Ma commande</a></li></ul></div>
           <div class="lg:col-span-2"><p class="eyebrow opacity-50 mb-6">Service</p><ul class="space-y-3 text-sm opacity-90">
-            <li>Paiement Mobile Money</li><li>Paiement à la livraison</li><li>Commande sur WhatsApp</li><li>Retrait à l’atelier</li></ul></div>
+            <li>Paiement Mobile Money</li><li>Paiement à la livraison</li><li>Commande sur WhatsApp</li><li>Retrait à l’atelier</li><li><button class="ulink opacity-100" onclick="installApp()">📲 Installer l’app</button></li></ul></div>
         </div>
         <div class="mt-20 pt-6 border-t border-ivory/15 flex flex-col md:flex-row gap-3 justify-between text-xs opacity-50">
           <p>© ${new Date().getFullYear()} Impano — Lubumbashi, RD Congo. Fait main avec amour.</p>
@@ -219,6 +219,45 @@
     });
     Cart.render();
   }
+
+
+  /* ---------- INVITE D'INSTALLATION PWA ---------- */
+  let deferred = null;
+  const standalone = () => matchMedia("(display-mode: standalone)").matches || navigator.standalone;
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream;
+  const SNOOZE = "impano_install_snooze";
+  function showInstall(ios) {
+    if ($("#install") || standalone()) return;
+    const until = +localStorage.getItem(SNOOZE) || 0;
+    if (Date.now() < until) return;
+    document.body.insertAdjacentHTML("beforeend", `
+      <div id="install" class="fixed inset-x-0 bottom-0 z-[110] p-4 md:p-6 pointer-events-none">
+        <div class="pointer-events-auto max-w-xl mx-auto bg-ink text-cowrie shadow-2xl p-6 flex gap-5 items-start translate-y-8 opacity-0 transition-all duration-700" id="install-card">
+          <img src="icons/icon-192.png" alt="" class="w-16 h-16 shrink-0 ring-1 ring-cowrie/30">
+          <div class="flex-1">
+            <p class="display text-2xl italic leading-tight">Installez l’application Impano</p>
+            <p class="text-sm opacity-75 mt-1.5 leading-snug">${ios ? "Touchez <b>Partager</b> <span aria-hidden='true'>⎋</span> puis <b>« Sur l’écran d’accueil »</b> pour l’avoir comme une vraie app." : "Accès direct depuis votre écran d’accueil, boutique rapide et hors-ligne."}</p>
+            <div class="flex gap-3 mt-4">
+              ${ios ? "" : '<button id="install-yes" class="btn btn-light !py-2.5 !px-5 !text-[.65rem]">Installer</button>'}
+              <button id="install-no" class="eyebrow !text-[.62rem] opacity-70 hover:opacity-100 px-2">Plus tard</button>
+            </div>
+          </div>
+        </div>
+      </div>`);
+    requestAnimationFrame(() => $("#install-card").classList.remove("translate-y-8", "opacity-0"));
+    const hide = (days) => { localStorage.setItem(SNOOZE, Date.now() + days * 864e5); $("#install").remove(); };
+    $("#install-no").onclick = () => hide(3);
+    const yes = $("#install-yes");
+    if (yes) yes.onclick = async () => {
+      if (!deferred) return hide(3);
+      deferred.prompt(); const { outcome } = await deferred.userChoice; deferred = null;
+      hide(outcome === "accepted" ? 3650 : 3);
+    };
+  }
+  addEventListener("beforeinstallprompt", (e) => { e.preventDefault(); deferred = e; setTimeout(() => showInstall(false), 2500); });
+  addEventListener("appinstalled", () => { localStorage.setItem(SNOOZE, Date.now() + 3650 * 864e5); $("#install")?.remove(); toast("Impano est installée ✦"); });
+  if (isIOS && !standalone()) addEventListener("load", () => setTimeout(() => showInstall(true), 3500));
+  window.installApp = () => deferred ? (localStorage.removeItem(SNOOZE), showInstall(false)) : (isIOS ? (localStorage.removeItem(SNOOZE), showInstall(true)) : toast("Utilisez le menu du navigateur : « Installer l’application »"));
 
   /* ---------- REVEAL + VIDÉOS ---------- */
   function observers() {
