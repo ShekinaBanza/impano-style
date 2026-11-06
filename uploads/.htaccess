@@ -1,0 +1,5 @@
+# Aucun script exécutable dans les envois
+<FilesMatch "\.(php|phtml|phar|cgi|pl|py)$">
+  Require all denied
+</FilesMatch>
+Options -Indexes

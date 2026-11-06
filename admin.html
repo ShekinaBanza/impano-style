@@ -130,7 +130,7 @@
         </ol>
         <p class="mt-4 text-terra">Le jeton reste sur cet appareil. Ne le partagez jamais et utilisez un jeton limité à ce seul dépôt.</p>
       </details></div>
-      <div id="sb-block" class="hidden border border-ink/15 p-6"><p class="eyebrow text-terra mb-2">Stockage sécurisé</p><p class="display text-2xl mb-2">Base de données Supabase connectée ✓</p><p class="text-sm opacity-70 leading-relaxed">Articles, textes, photos, vidéos et commandes sont enregistrés dans votre base. « Publier » met le site à jour <b>immédiatement</b> pour tous les visiteurs, sans GitHub.</p></div>
+      <div id="sb-block" class="hidden border border-ink/15 p-6"><p class="eyebrow text-terra mb-2">Stockage sécurisé</p><p class="display text-2xl mb-2">Base de données SQLite connectée ✓</p><p class="text-sm opacity-70 leading-relaxed">Articles, textes, photos, vidéos et commandes sont enregistrés dans votre base. « Publier » met le site à jour <b>immédiatement</b> pour tous les visiteurs, sans GitHub.</p></div>
     </section>
   </main>
 </div>
@@ -199,10 +199,10 @@ const isAdmin = async () => { if (!window.sb) return false; const { data, error 
     };
     return;
   }
-  // Mode local (Supabase non configuré)
+  // Mode local (serveur non disponible)
   const stored = localStorage.getItem("impano_admin_pw");
   first.classList.remove("hidden");
-  first.innerHTML = "⚠ Base de données non configurée : mode local. " + (stored ? "" : "Mot de passe par défaut : <b>impano2025</b>. ") + "Voir SETUP-SUPABASE.md pour activer le stockage sécurisé.";
+  first.innerHTML = "⚠ Serveur non disponible : mode local. " + (stored ? "" : "Mot de passe par défaut : <b>impano2025</b>. ") + "Voir DEPLOY-HOSTINGER.md.";
   if (sessionStorage.getItem("impano_admin") === "1") return enter();
   $("#login-form").onsubmit = async (e) => {
     e.preventDefault();
@@ -419,13 +419,13 @@ const gh = () => ({ owner: "ShekinaBanza", repo: "impano-style", branch: "main",
 const isDirty = () => localStorage.getItem("impano_dirty") === "1";
 let autoT = null, autoBusy = false;
 function markDirty() { localStorage.setItem("impano_dirty", "1"); drawDirty(); if (window.sb) { clearTimeout(autoT); autoT = setTimeout(autoPublish, 1500); } }
-/* Avec Supabase : chaque modification est enregistrée en ligne automatiquement (plus besoin de cliquer sur Publier) */
+/* Avec le serveur : chaque modification est enregistrée en ligne automatiquement (plus besoin de cliquer sur Publier) */
 async function autoPublish() {
   if (autoBusy) { autoT = setTimeout(autoPublish, 1500); return; }
   if (!isDirty()) return;
   autoBusy = true; const lg = [];
   try { say("Enregistrement en ligne…"); await publishSB((m) => lg.push(m)); say("En ligne ✦ visible sur tous les appareils"); drawList(); drawDirty(); }
-  catch (e) { console.error(e); alert("⚠ Enregistrement en ligne impossible : " + e.message + " — Vérifiez que vous êtes connecté avec le compte administrateur et que schema.sql + make_admin ont été exécutés dans Supabase."); }
+  catch (e) { console.error(e); alert("⚠ Enregistrement en ligne impossible : " + e.message + " — Vérifiez que vous êtes connecté avec le compte administrateur et que l’API est bien installée sur le serveur (dossier api/)."); }
   finally { autoBusy = false; }
 }
 function drawDirty() {
@@ -542,7 +542,7 @@ $("#clist").addEventListener("change", async (e) => {
   if (vd && vd.files[0]) {
     const file = vd.files[0], st = $(`[data-vstat="${vd.dataset.vid}"]`);
     if (file.size > 40 * 1048576) { st.textContent = "Vidéo trop lourde (40 Mo max)."; return; }
-    if (!window.sb && !gh().token) { st.textContent = "Configurez Supabase (ou le jeton GitHub, onglet Publier) pour téléverser une vidéo."; return; }
+    if (!window.sb && !gh().token) { st.textContent = "Hébergez le site sur le serveur (ou ajoutez le jeton GitHub, onglet Publier) pour téléverser une vidéo."; return; }
     try {
       st.textContent = "Envoi en cours… (peut prendre une minute)";
       const clean = `${Date.now().toString(36)}-${file.name.replace(/[^a-z0-9.]+/gi, "-").toLowerCase()}`;
@@ -575,7 +575,7 @@ $("#gh-test").onclick = async () => {
     const j = await r.json(); say(j.permissions && j.permissions.push ? "Connexion OK — écriture autorisée ✦" : "Connecté, mais le jeton n’a pas le droit d’écrire.");
   } catch (er) { alert(er.message); }
 };
-/* Envoi d'un fichier dans le stockage Supabase (bucket « media ») et URL publique */
+/* Envoi d'un fichier dans le dossier uploads/ du serveur et URL publique */
 async function sbUpload(path, blobOrFile, type) {
   const { error } = await sb.storage.from("media").upload(path, blobOrFile, { contentType: type || "application/octet-stream", upsert: true });
   if (error) throw new Error("Stockage : " + error.message);

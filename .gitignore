@@ -4,3 +4,11 @@
 /.claude/
 .DS_Store
 Thumbs.db
+
+# Serveur : configuration, base SQLite et fichiers envoyés par l'admin (jamais sur GitHub)
+/api/config.php
+/api/storage/*
+!/api/storage/.htaccess
+/uploads/*
+!/uploads/.htaccess
+/*.zip

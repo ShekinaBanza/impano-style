@@ -186,7 +186,7 @@ document.addEventListener("DOMContentLoaded", () => {
     $("#d-wa-note").textContent = win ? "WhatsApp s’est ouvert avec le détail de votre commande. Si besoin, rouvrez-le avec le bouton ci-dessous." : "Appuyez sur le bouton ci-dessous pour envoyer votre commande sur WhatsApp.";
     form.classList.add("hidden"); $("#done").classList.remove("hidden");
 
-    // Enregistrement sécurisé dans la base (Supabase)
+    // Enregistrement sécurisé dans la base (serveur)
     const st = $("#d-save");
     if (window.sb) {
       st.textContent = "Enregistrement de la commande…";

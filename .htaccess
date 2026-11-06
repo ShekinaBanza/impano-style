@@ -1,0 +1,42 @@
+# ===== Impano — configuration Apache / LiteSpeed (Hostinger) =====
+Options -Indexes
+DirectoryIndex index.html
+
+<IfModule mod_rewrite.c>
+RewriteEngine On
+
+# Toujours en HTTPS
+RewriteCond %{HTTPS} !=on
+RewriteCond %{HTTP:X-Forwarded-Proto} !https
+RewriteCond %{HTTP_HOST} !^localhost
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# Adresses propres
+RewriteRule ^boutique(/.*)?$ boutique.html [L]
+RewriteRule ^produit(/.*)?$ produit.html [L]
+RewriteRule ^histoire/?$ histoire.html [L]
+RewriteRule ^commande/?$ commande.html [L]
+RewriteRule ^admin/?$ admin.html [L]
+</IfModule>
+
+# Fichiers qui ne doivent pas être publics
+<FilesMatch "(^router\.php$|^serve\.py$|\.md$|\.sql$|\.sqlite$|^\.gitignore$)">
+  Require all denied
+</FilesMatch>
+
+ErrorDocument 404 /404.html
+
+# Cache : les pages se mettent à jour tout de suite, les médias sont gardés longtemps
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType image/jpeg "access plus 30 days"
+  ExpiresByType image/png "access plus 30 days"
+  ExpiresByType video/mp4 "access plus 30 days"
+  ExpiresByType text/css "access plus 1 hour"
+  ExpiresByType application/javascript "access plus 1 hour"
+</IfModule>
+<IfModule mod_headers.c>
+  Header set X-Content-Type-Options "nosniff"
+  Header set Referrer-Policy "strict-origin-when-cross-origin"
+  Header set X-Frame-Options "SAMEORIGIN"
+</IfModule>

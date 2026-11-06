@@ -221,7 +221,7 @@ const DEFAULT_PRODUCTS = [
 (function () {
   const read = (k) => { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } };
   const SITE = window.SITE || {};
-  const REMOTE = read("impano_remote") || {};            // dernière copie reçue de Supabase
+  const REMOTE = read("impano_remote") || {};            // dernière copie reçue de le serveur
   const cfg = read("impano_config") || REMOTE.config || SITE.config;
   if (cfg) Object.assign(CONFIG, cfg, { shipping: Object.assign({}, CONFIG.shipping, cfg.shipping || {}) });
   window.DEFAULT_PRODUCTS = DEFAULT_PRODUCTS;

@@ -1,0 +1,7 @@
+# La base SQLite et la configuration ne doivent jamais être téléchargeables
+<FilesMatch "\.(sqlite|sqlite-wal|sqlite-shm|db)$">
+  Require all denied
+</FilesMatch>
+<Files "config.php">
+  Require all denied
+</Files>

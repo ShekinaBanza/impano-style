@@ -281,7 +281,7 @@
       email = email.trim().toLowerCase();
       if (window.sb) {
         const { data, error } = await sb.auth.signUp({ email, password, options: { data: { name: name.trim(), phone: phone.trim() } } });
-        if (error) throw new Error(/registered|exists/i.test(error.message) ? "Un compte existe déjà avec cet email." : /rate limit|too many|security purposes/i.test(error.message) ? "Trop de tentatives pour le moment, réessayez dans quelques minutes." : /password/i.test(error.message) ? "Mot de passe trop faible (8 caractères conseillés)." : /valid email|invalid/i.test(error.message) ? "Adresse email invalide." : "Impossible de créer le compte : " + error.message);
+        if (error) throw new Error(/registered|exists|existe/i.test(error.message) ? "Un compte existe déjà avec cet email." : /rate limit|too many|security purposes/i.test(error.message) ? "Trop de tentatives pour le moment, réessayez dans quelques minutes." : /password/i.test(error.message) ? "Mot de passe trop faible (8 caractères conseillés)." : /valid email|invalid/i.test(error.message) ? "Adresse email invalide." : "Impossible de créer le compte : " + error.message);
         if (data.user && data.user.identities && data.user.identities.length === 0) throw new Error("Un compte existe déjà avec cet email.");
         if (!data.session) throw new Error("CONFIRM");
         cacheUser(data.user); return;
@@ -438,7 +438,7 @@
   }
 
 
-  /* ---------- CATALOGUE EN LIGNE (Supabase) : copie locale rafraîchie à chaque visite ---------- */
+  /* ---------- CATALOGUE EN LIGNE (serveur) : copie locale rafraîchie à chaque visite ---------- */
   async function refreshRemote() {
     if (!window.sb) return;
     try {

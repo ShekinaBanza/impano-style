@@ -1,5 +1,5 @@
 /* Impano — service worker : adresses propres + mode hors-ligne pour les pages et images vues */
-const VERSION = "impano-v12";
+const VERSION = "impano-v14";
 const ROOT = new URL("./", self.registration.scope).pathname;           // ex. /impano-style/
 const CORE = ["./", "index.html", "boutique.html", "produit.html", "commande.html", "histoire.html", "admin.html",
   "css/style.css", "js/app.js", "js/data.js", "js/config.js", "js/sb.js", "js/tw-config.js", "data/site.js", "manifest.webmanifest",
@@ -27,6 +27,7 @@ self.addEventListener("fetch", (e) => {
   const url = new URL(req.url);
   if (req.headers.has("range") || /\.mp4$/.test(url.pathname)) return;      // vidéos : réseau direct
   const sameOrigin = url.origin === location.origin;
+  if (sameOrigin && url.pathname.indexOf("/api/") !== -1) return;           // API : jamais en cache
 
   if (sameOrigin && req.mode === "navigate") {                               // pages : réseau d'abord, cache en secours
     const f = pageFile(url);
