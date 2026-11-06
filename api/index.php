@@ -32,6 +32,13 @@ if ((int)$db->query('SELECT COUNT(*) FROM users WHERE is_admin=1')->fetchColumn(
      ->execute([strtolower($cfg['admin_email']), 'Administrateur', password_hash($cfg['admin_password'], PASSWORD_DEFAULT), gmdate('c')]);
 }
 
+/* Catalogue d'origine : copié UNE SEULE FOIS dans la base (ensuite la base fait foi et l'admin modifie tout) */
+if ((int)$db->query("SELECT COUNT(*) FROM site_data WHERE key='products'")->fetchColumn() === 0 && is_file(__DIR__ . '/seed.json')) {
+  $seed = json_decode((string)file_get_contents(__DIR__ . '/seed.json'), true);
+  $ins = $db->prepare('INSERT OR IGNORE INTO site_data(key,value,updated_at) VALUES(?,?,?)');
+  foreach (['products', 'config'] as $k) if (!empty($seed[$k])) $ins->execute([$k, json_encode($seed[$k], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), gmdate('c')]);
+}
+
 /* ---------- Session ---------- */
 $https = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https');
 session_name('impano');
