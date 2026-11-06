@@ -70,6 +70,34 @@ const DEFAULT_PRODUCTS = [
     details: ["100 % fait main", "Broderie de motifs Bogolanfini-inspirés", "Taille unique"]
   },
   {
+    id: "bonnet-noir-perles", cat: "bonnets", name: "Bonnet Noir Perlé", price: 38,
+    img: "assets/img/b-noir-perles.jpg", gallery: ["assets/img/b-noir-perles.jpg"],
+    tag: "Pièce unique", color: "Noir & perles blanches",
+    desc: "Un filet noir profond parsemé de petites perles nacrées : sobre le jour, scintillant le soir.",
+    details: ["100 % fait main", "Taille unique, très extensible", "Pièce n’existant qu’en un exemplaire"]
+  },
+  {
+    id: "bonnet-ivoire-orange", cat: "bonnets", name: "Bonnet Ivoire Orange", price: 38,
+    img: "assets/img/b-ivoire-orange.jpg", gallery: ["assets/img/b-ivoire-orange.jpg"],
+    tag: "Pièce unique", color: "Ivoire & orange",
+    desc: "Des bandes ivoire et orange sur fond noir, un graphisme solaire qui éclaire le visage.",
+    details: ["100 % fait main", "Taille unique, très extensible", "Pièce n’existant qu’en un exemplaire"]
+  },
+  {
+    id: "bonnet-panafricain", cat: "bonnets", name: "Bonnet Panafricain", price: 38,
+    img: "assets/img/b-panafricain.jpg", gallery: ["assets/img/b-panafricain.jpg"],
+    tag: "Pièce unique", color: "Rouge, jaune, vert & noir",
+    desc: "Les couleurs panafricaines en mailles ouvertes. Un bonnet fier, léger et très expressif.",
+    details: ["100 % fait main", "Taille unique, très extensible", "Pièce n’existant qu’en un exemplaire"]
+  },
+  {
+    id: "bonnet-noir-cauris", cat: "bonnets", name: "Bonnet Noir Cauris", price: 38,
+    img: "assets/img/b-noir-cauris.jpg", gallery: ["assets/img/b-noir-cauris.jpg"],
+    tag: "Pièce unique", color: "Noir & cauris",
+    desc: "Maille noire ajourée, cauris et perles cousus sur le pourtour. Le classique devenu signature.",
+    details: ["100 % fait main", "Taille unique, très extensible", "Pièce n’existant qu’en un exemplaire"]
+  },
+  {
     id: "collection-six-bonnets", cat: "bonnets", name: "Coffret Six Bonnets", price: 195,
     img: "assets/img/p29.jpg", gallery: ["assets/img/p29.jpg"],
     tag: "Édition", color: "Assortiment",
@@ -104,6 +132,42 @@ const DEFAULT_PRODUCTS = [
     img: "assets/img/p22.jpg", gallery: ["assets/img/p22.jpg"],
     tag: "Sur commande", color: "Noir & or",
     desc: "Croissant de lune et soleil dorés brodés au point serré. Le sac de tous les jours, version céleste.",
+    details: ["100 % fait main", "Zip solide, sangle réglable", "Délai : 7 à 10 jours"]
+  },
+
+  {
+    id: "sac-bleu-royal", cat: "sacs", name: "Sac Banane Bleu Royal", price: 42,
+    img: "assets/img/s-bleu-royal.jpg", gallery: ["assets/img/s-bleu-royal.jpg"],
+    tag: "Sur commande", color: "Bleu & jaune",
+    desc: "Un bleu électrique rehaussé de petits motifs jaunes tricotés. Le sac de tous les jours, version éclatante.",
+    details: ["100 % fait main", "Zip solide, sangle réglable", "Délai : 7 à 10 jours"]
+  },
+  {
+    id: "sac-kaleidoscope", cat: "sacs", name: "Sac Banane Kaléidoscope", price: 42,
+    img: "assets/img/s-kaleidoscope.jpg", gallery: ["assets/img/s-kaleidoscope.jpg"],
+    tag: "Sur commande", color: "Bleu & jaune",
+    desc: "Un grand motif géométrique bleu et jaune, sangle à rayures assortie. Graphique et joyeux.",
+    details: ["100 % fait main", "Zip solide, sangle réglable", "Délai : 7 à 10 jours"]
+  },
+  {
+    id: "sac-soleil-losange", cat: "sacs", name: "Sac Banane Soleil", price: 42,
+    img: "assets/img/s-soleil-losange.jpg", gallery: ["assets/img/s-soleil-losange.jpg"],
+    tag: "Sur commande", color: "Jaune & bleu",
+    desc: "Jaune soleil et losanges bleus tricotés. Il illumine n’importe quelle tenue.",
+    details: ["100 % fait main", "Zip solide, sangle réglable", "Délai : 7 à 10 jours"]
+  },
+  {
+    id: "sac-terre-mouchete", cat: "sacs", name: "Sac Banane Terre Mouchetée", price: 42,
+    img: "assets/img/s-terre.jpg", gallery: ["assets/img/s-terre.jpg"],
+    tag: "Sur commande", color: "Terre & cuivre",
+    desc: "Un fil chiné aux tons de terre, léger et chaleureux, pour un sac qui épouse le corps.",
+    details: ["100 % fait main", "Zip solide, sangle réglable", "Délai : 7 à 10 jours"]
+  },
+  {
+    id: "sac-jardin-noir", cat: "sacs", name: "Sac Banane Jardin Noir", price: 42,
+    img: "assets/img/s-jardin-noir.jpg", gallery: ["assets/img/s-jardin-noir.jpg"],
+    tag: "Sur commande", color: "Noir & fleurs",
+    desc: "Des fleurs crochetées sur fond noir, bordées d’une sangle fine. Poétique et discret.",
     details: ["100 % fait main", "Zip solide, sangle réglable", "Délai : 7 à 10 jours"]
   },
 
