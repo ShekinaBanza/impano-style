@@ -118,22 +118,21 @@
       Chaque pièce est faite main &nbsp;✦&nbsp; Livraison offerte dès ${fmt(CONFIG.freeShippingFrom)}
     </div>
     <header id="header" class="${onHero ? "on-hero " : "solid "}fixed top-[34px] inset-x-0 z-50 border-b border-transparent">
-      <div class="max-w-[1500px] mx-auto px-5 md:px-10 h-20 grid grid-cols-3 items-center">
-        <nav class="hidden lg:flex gap-8 eyebrow">
-          ${NAV.slice(0, 4).map(([h, l]) => `<a href="${h}" class="ulink ${cur === h ? "active" : ""}">${l}</a>`).join("")}
+      <div class="max-w-[1500px] mx-auto px-4 md:px-10 h-20 relative flex items-center justify-between gap-4 whitespace-nowrap">
+        <nav class="hidden xl:flex gap-7 2xl:gap-9 eyebrow">
+          ${NAV.map(([h, l], i) => `<a href="${h}" class="ulink ${i === 4 ? "hidden 2xl:inline " : ""}${cur === h ? "active" : ""}">${l}</a>`).join("")}
         </nav>
-        <button id="burger" class="lg:hidden justify-self-start eyebrow flex items-center gap-3" aria-label="Menu"><span class="block w-6 h-px bg-current relative before:absolute before:-top-1.5 before:w-6 before:h-px before:bg-current after:absolute after:top-1.5 after:w-4 after:h-px after:bg-current"></span></button>
-        <a href="./" class="hlogo justify-self-center text-center leading-none" aria-label="Impano — accueil">
-          <span class="logo text-[2.1rem] md:text-[2.6rem] block">impano</span>
+        <button id="burger" class="xl:hidden w-10 h-10 -ml-2 grid place-items-center eyebrow" aria-label="Menu"><span class="block w-6 h-px bg-current relative before:absolute before:-top-1.5 before:w-6 before:h-px before:bg-current after:absolute after:top-1.5 after:w-4 after:h-px after:bg-current"></span></button>
+        <a href="./" class="hlogo absolute left-1/2 -translate-x-1/2 text-center leading-none" aria-label="Impano — accueil">
+          <span class="logo text-[1.75rem] sm:text-[2.1rem] md:text-[2.6rem] block">impano</span>
           <span class="logo-tag block text-[.45rem] mt-1.5 opacity-70">Wear the gift · Be the gift</span>
         </a>
-        <div class="justify-self-end flex items-center gap-4 md:gap-6 eyebrow">
-          <a href="histoire" class="hidden lg:inline ulink">La Maison</a>
-          <button id="theme-toggle" class="flex items-center" aria-label="Changer de thème (clair / sombre)" title="Mode sombre"><svg class="w-[22px] h-[22px] theme-moon"><use href="#moon"/></svg><svg class="w-[22px] h-[22px] theme-sun"><use href="#sun"/></svg></button>
+        <div class="flex items-center gap-3 sm:gap-5 eyebrow ml-auto">
+          <button id="theme-toggle" class="hidden sm:flex items-center" aria-label="Changer de thème (clair / sombre)" title="Mode sombre"><svg class="w-[22px] h-[22px] theme-moon"><use href="#moon"/></svg><svg class="w-[22px] h-[22px] theme-sun"><use href="#sun"/></svg></button>
           <button id="open-search" class="flex items-center gap-2" aria-label="Rechercher"><svg class="w-[22px] h-[22px]"><use href="#search"/></svg></button>
-          <button id="open-acct" class="flex items-center gap-2" aria-label="Se connecter"><svg class="w-[22px] h-[22px]"><use href="#user"/></svg><span id="acct-label" class="hidden lg:inline">Se connecter</span></button>
+          <button id="open-acct" class="flex items-center gap-2" aria-label="Se connecter"><svg class="w-[22px] h-[22px]"><use href="#user"/></svg><span id="acct-label" class="hidden xl:inline">Se connecter</span></button>
           <button id="open-cart" class="relative flex items-center gap-2" aria-label="Ouvrir le panier">
-            <span class="hidden sm:inline">Panier</span>
+            <span class="hidden md:inline">Panier</span>
             <svg class="w-6 h-6"><use href="#bag"/></svg>
             <span data-cart-count class="hidden absolute -top-2 -right-3 sm:static sm:ml-0 bg-terra text-cowrie rounded-full min-w-[1.25rem] h-5 px-1 grid place-items-center !text-[.65rem] !tracking-normal"></span>
           </button>
@@ -149,6 +148,7 @@
           ${[["./", "Accueil"], ...NAV].map(([h, l]) => `<a href="${h}" class="display text-5xl italic">${l}</a>`).join("")}
         </nav>
         <button id="menu-acct" class="eyebrow ulink self-start mt-10">Se connecter / Mon compte</button>
+        <button id="menu-theme" class="eyebrow ulink self-start mt-5 sm:hidden">Mode clair / sombre</button>
         <div class="mt-auto pt-10 text-sm opacity-60">Lubumbashi · RD Congo<br>Wear the Gift · Be the Gift</div>
       </aside>
     </div>
@@ -421,6 +421,8 @@
     </div>
     <a id="wa-float" href="https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent("Bonjour Impano 👋")}" target="_blank" rel="noopener" aria-label="Discuter sur WhatsApp" class="fixed right-4 bottom-4 md:right-6 md:bottom-6 z-[100] w-14 h-14 rounded-full bg-[#25D366] text-white grid place-items-center shadow-xl hover:scale-110 transition-transform"><svg class="w-7 h-7"><use href="#wa"/></svg></a>`);
     searchUI();
+    const tg = () => { const d = !document.documentElement.classList.contains("dark"); setTheme(d ? "dark" : "light"); };
+    $("#menu-theme").onclick = tg;
     $("#theme-toggle").onclick = () => { const d = !document.documentElement.classList.contains("dark"); setTheme(d ? "dark" : "light"); };
     $("#open-search").onclick = () => openSearch();
     $("#open-acct").onclick = () => openAccount();

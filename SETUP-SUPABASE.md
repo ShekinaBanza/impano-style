@@ -2,8 +2,8 @@
 
 1. Créez un projet gratuit sur https://supabase.com (région proche, ex. Europe).
 2. **SQL Editor** → New query → collez le contenu de `supabase/schema.sql` → Run.
-3. **Authentication → Users → Add user → Create new user** : email `shekina646@gmail.com`, un mot de passe fort, cochez *Auto Confirm User*.
-4. Dans le SQL Editor, lancez : `select public.make_admin('shekina646@gmail.com');`
+3. **Authentication → Users → Add user → Create new user** : email `impano-style@impano.cd`, un mot de passe fort, cochez *Auto Confirm User*.
+4. Dans le SQL Editor, lancez : `select public.make_admin('impano-style@impano.cd');`
 5. (Optionnel) **Authentication → Providers → Email** : désactivez « Confirm email » pour que les clients puissent s'inscrire sans mail de confirmation.
 6. **Project Settings → API** : copiez *Project URL* et la clé **anon public**, puis collez-les dans `js/config.js` :
    `window.SB_CONFIG = { url: "https://xxxx.supabase.co", anonKey: "eyJ..." };`
