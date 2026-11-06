@@ -114,3 +114,49 @@ body::after {
 .fav { transition: transform .3s; }
 /* Barre d'achat collante (mobile) */
 #sticky-buy { transition: transform .5s cubic-bezier(.7,0,.2,1); }
+
+/* Logo du pied de page : s'adapte à la largeur de sa colonne */
+.logo-foot-wrap { container-type: inline-size; }
+.logo-foot { font-size: calc(100cqw / 6.2); }
+
+/* Bouton thème : lune en clair, soleil en sombre */
+.theme-sun { display: none; }
+html.dark .theme-sun { display: block; }
+html.dark .theme-moon { display: none; }
+
+/* ================= MODE SOMBRE ================= */
+html.dark { color-scheme: dark; }
+html.dark body { background: #14100D; color: #F1E9DC; }
+html.dark body::after { mix-blend-mode: screen; opacity: .05; }
+html.dark .bg-ivory { background-color: #14100D; }
+html.dark .bg-bone { background-color: #1E1812; }
+html.dark [class*="bg-ivory/"] { background-color: rgba(20,16,13,.92); }
+html.dark .bg-ink { background-color: #0A0806; }
+html.dark [class*="bg-ink/"] { background-color: rgba(0,0,0,.65); }
+html.dark .text-ink { color: #F1E9DC; }
+html.dark [class*="border-ink"], html.dark .border-ink\/10 { border-color: rgba(241,233,220,.16); }
+html.dark [class*="divide-ink"] > * { border-color: rgba(241,233,220,.14); }
+html.dark [class*="bg-ink/1"], html.dark .bg-ink\/15 { background-color: rgba(241,233,220,.15); }
+html.dark .hover\:bg-ink:hover { background-color: #F1E9DC; color: #14100D; }
+html.dark .hover\:text-ivory:hover { color: #14100D; }
+html.dark #header.solid { background: rgba(20,16,13,.94); color: #F1E9DC; border-color: rgba(241,233,220,.12); }
+html.dark .btn-ink { background: #F1E9DC; color: #14100D; border-color: #F1E9DC; }
+html.dark .btn-ink:hover { background: #D9772F; border-color: #D9772F; color: #14100D; }
+html.dark .btn-ghost:hover { background: #F1E9DC; color: #14100D; }
+html.dark .btn-light:hover { color: #14100D; }
+html.dark .field { border-bottom-color: rgba(241,233,220,.3); color: inherit; }
+html.dark .field:focus { border-color: #D9772F; }
+html.dark select, html.dark select option { background: #14100D; color: #F1E9DC; }
+html.dark .choice { border-color: rgba(241,233,220,.22); }
+html.dark .choice:has(input:checked) { border-color: #F1E9DC; background: #1E1812; }
+html.dark .size-opt { border-color: rgba(241,233,220,.3); }
+html.dark .size-opt:hover { border-color: #F1E9DC; }
+html.dark .size-opt.on { background: #F1E9DC; color: #14100D; border-color: #F1E9DC; }
+html.dark .thumb.on, html.dark .thumb:hover { border-color: #F1E9DC; }
+html.dark .fav svg { color: #F1E9DC; }
+html.dark .fav.on svg { color: #B4521E; }
+html.dark ::selection { background: #D9772F; color: #14100D; }
+html.dark .skip { background: #F1E9DC; color: #14100D; }
+html.dark #install-card { background: #1E1812; }
+html.dark .bg-ink.text-cowrie, html.dark footer { border-top: 1px solid rgba(241,233,220,.06); }
+html.dark img, html.dark video { filter: brightness(.94); }

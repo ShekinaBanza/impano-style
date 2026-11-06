@@ -93,6 +93,8 @@
   const sprite = `<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
     <symbol id="cowrie" viewBox="0 0 40 60"><ellipse cx="20" cy="30" rx="17" ry="27" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M20 8c-5 12-5 32 0 44" fill="none" stroke="currentColor" stroke-width="1.6"/>${Array.from({length: 9}, (_, i) => `<path d="M${15 - (i % 2)} ${16 + i * 4}h-4M${25 + (i % 2)} ${16 + i * 4}h4" stroke="currentColor" stroke-width="1.2"/>`).join("")}</symbol>
     <symbol id="bag" viewBox="0 0 24 24"><path d="M5 8h14l-1 12H6L5 8Z M9 8V6a3 3 0 0 1 6 0v2" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></symbol>
+    <symbol id="moon" viewBox="0 0 24 24"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4 8.5 8.5 0 1 0 20 14.5Z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></symbol>
+    <symbol id="sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></symbol>
     <symbol id="user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M4 21c1-4.5 4-6.5 8-6.5s7 2 8 6.5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></symbol>
     <symbol id="search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="m16 16 5 5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></symbol>
     <symbol id="heart" viewBox="0 0 24 24"><path d="M12 20.5S3.5 15 3.5 8.9A4.4 4.4 0 0 1 12 7a4.4 4.4 0 0 1 8.5 1.9C20.5 15 12 20.5 12 20.5Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></symbol>
@@ -127,6 +129,7 @@
         </a>
         <div class="justify-self-end flex items-center gap-4 md:gap-6 eyebrow">
           <a href="histoire.html" class="hidden lg:inline ulink">La Maison</a>
+          <button id="theme-toggle" class="flex items-center" aria-label="Changer de thème (clair / sombre)" title="Mode sombre"><svg class="w-[22px] h-[22px] theme-moon"><use href="#moon"/></svg><svg class="w-[22px] h-[22px] theme-sun"><use href="#sun"/></svg></button>
           <button id="open-search" class="flex items-center gap-2" aria-label="Rechercher"><svg class="w-[22px] h-[22px]"><use href="#search"/></svg></button>
           <button id="open-acct" class="flex items-center gap-2" aria-label="Se connecter"><svg class="w-[22px] h-[22px]"><use href="#user"/></svg><span id="acct-label" class="hidden lg:inline">Se connecter</span></button>
           <button id="open-cart" class="relative flex items-center gap-2" aria-label="Ouvrir le panier">
@@ -175,7 +178,7 @@
       <div class="max-w-[1500px] mx-auto px-5 md:px-10 pt-24 pb-10">
         <div class="grid lg:grid-cols-12 gap-14">
           <div class="lg:col-span-5">
-            <p class="logo text-[clamp(4.5rem,13vw,10rem)]">impano</p>
+            <div class="logo-foot-wrap"><p class="logo logo-foot">impano</p></div>
             <p class="logo-tag text-xs mt-8 opacity-60" data-cms="global.footer.tag">Wear the gift<br>Be the gift</p>
             <p class="mt-8 max-w-sm opacity-70 leading-relaxed" data-cms="global.footer.blurb">« Impano » signifie <em>le don</em>. Chaque fil que nous nouons est un cadeau — pour celui qui le crée, pour celui qui le porte.</p>
           </div>
@@ -354,6 +357,11 @@
     $("#search-chips").innerHTML = CATEGORIES.map((c) => `<a href="boutique.html?cat=${c.id}" class="eyebrow border border-ink/25 px-4 py-2 hover:bg-ink hover:text-ivory transition">${escH(c.short)}</a>`).join("");
   }
 
+  function setTheme(t) {
+    document.documentElement.classList.toggle("dark", t === "dark");
+    try { localStorage.setItem("impano_theme", t); } catch (e) {}
+    const m = document.querySelector('meta[name="theme-color"]'); if (m) m.content = t === "dark" ? "#0A0806" : "#15110E";
+  }
   function extras() {
     document.body.insertAdjacentHTML("beforeend", `
     <div id="search" class="fixed inset-0 z-[85] hidden">
@@ -381,6 +389,7 @@
     </div>
     <a id="wa-float" href="https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent("Bonjour Impano 👋")}" target="_blank" rel="noopener" aria-label="Discuter sur WhatsApp" class="fixed right-4 bottom-4 md:right-6 md:bottom-6 z-[100] w-14 h-14 rounded-full bg-[#25D366] text-white grid place-items-center shadow-xl hover:scale-110 transition-transform"><svg class="w-7 h-7"><use href="#wa"/></svg></a>`);
     searchUI();
+    $("#theme-toggle").onclick = () => { const d = !document.documentElement.classList.contains("dark"); setTheme(d ? "dark" : "light"); };
     $("#open-search").onclick = () => openSearch();
     $("#open-acct").onclick = () => openAccount();
     const ma = $("#menu-acct"); if (ma) ma.onclick = () => { $("#close-menu").click(); openAccount(); };
