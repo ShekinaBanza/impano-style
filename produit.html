@@ -33,6 +33,7 @@
 </main>
 
 <div id="footer"></div>
+<script src="data/site.js"></script>
 <script src="js/data.js"></script>
 <script src="js/app.js"></script>
 <script>
@@ -52,7 +53,8 @@ document.addEventListener("DOMContentLoaded", () => {
       </div>
       <div class="relative overflow-hidden bg-bone aspect-[4/5] cursor-zoom-in" id="stage">
         <img id="main" src="${p.gallery[0]}" alt="${p.name}" class="w-full h-full object-cover transition-transform duration-500 origin-center">
-        <span class="absolute top-5 left-5 eyebrow bg-ivory/90 px-3 py-1.5 !text-[.58rem]">${p.tag}</span>
+        <span class="absolute top-5 left-5 eyebrow bg-ivory/90 px-3 py-1.5 !text-[.58rem]">${p.soldout ? "Épuisé" : p.tag}</span>
+        <button data-fav="${p.id}" class="fav absolute top-4 right-4 z-10 w-11 h-11 grid place-items-center bg-ivory/90 rounded-full ${Fav.has(p.id) ? "on" : ""}" aria-label="Ajouter aux favoris"><svg class="w-5 h-5"><use href="#heart"/></svg></button>
       </div>
     </div>
 
@@ -103,6 +105,13 @@ document.addEventListener("DOMContentLoaded", () => {
   const ok = () => { if (p.sizes && !size) { $("#size-err").classList.remove("hidden"); sz.scrollIntoView({ block: "center", behavior: "smooth" }); return false; } return true; };
   if ($("#add")) { $("#add").onclick = () => { if (ok()) { Cart.add(p.id, size, qty); openCart(); } };
   $("#buy").onclick = () => { if (ok()) { Cart.add(p.id, size, qty); location.href = "commande.html"; } }; }
+
+  // Barre d'achat collante (mobile)
+  if (!p.soldout) {
+    document.body.insertAdjacentHTML("beforeend", `<div id="sticky-buy" class="md:hidden fixed bottom-0 inset-x-0 z-[60] bg-ivory border-t border-ink/15 pl-4 pr-24 py-3 flex items-center gap-4 translate-y-full"><div class="min-w-0 flex-1"><p class="display text-lg leading-none truncate">${p.name}</p><p class="text-sm opacity-60">${fmt(p.price)}</p></div><button id="sticky-add" class="btn btn-ink !py-3 !px-5">Ajouter</button></div>`);
+    $("#sticky-add").onclick = () => $("#add").click();
+    new IntersectionObserver(([en]) => $("#sticky-buy").classList.toggle("translate-y-full", en.isIntersecting || en.boundingClientRect.top > 0), { threshold: 0 }).observe($("#add"));
+  }
 
   // Suggestions
   const rel = PRODUCTS.filter((x) => x.id !== p.id).sort((a, b) => (b.cat === p.cat) - (a.cat === p.cat)).slice(0, 4);

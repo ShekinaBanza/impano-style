@@ -103,3 +103,14 @@ body::after {
 .logo-hero { font-size: min(calc((100vw - 2.5rem) / 6.1), 20rem); text-shadow: 0 2px 40px rgba(0,0,0,.25); }
 #header.on-hero:not(.solid) .hlogo { opacity: 0; pointer-events: none; }
 .hlogo { transition: opacity .5s; }
+
+/* Accessibilité & favoris */
+.skip { position: absolute; left: -999px; top: 0; z-index: 200; background: #15110E; color: #FBF8F1; padding: .8rem 1.2rem; font-size: .8rem; letter-spacing: .1em; }
+.skip:focus { left: 0; }
+:focus-visible { outline: 2px solid #B4521E; outline-offset: 3px; }
+.fav svg { fill: transparent; color: #15110E; transition: transform .3s, fill .3s, color .3s; }
+.fav:hover svg { transform: scale(1.15); }
+.fav.on svg { fill: #B4521E; color: #B4521E; }
+.fav { transition: transform .3s; }
+/* Barre d'achat collante (mobile) */
+#sticky-buy { transition: transform .5s cubic-bezier(.7,0,.2,1); }

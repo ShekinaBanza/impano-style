@@ -195,15 +195,31 @@ const DEFAULT_PRODUCTS = [
   }
 ];
 
-/* ---- Données modifiables depuis /admin.html (stockées dans le navigateur) ---- */
+/* ---- Données modifiables depuis /admin.html ----
+   Priorité : brouillon local (admin) > données publiées (data/site.js) > valeurs d'origine */
 (function () {
   const read = (k) => { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } };
-  const cfg = read("impano_config");
+  const SITE = window.SITE || {};
+  const cfg = read("impano_config") || SITE.config;
   if (cfg) Object.assign(CONFIG, cfg, { shipping: Object.assign({}, CONFIG.shipping, cfg.shipping || {}) });
   window.DEFAULT_PRODUCTS = DEFAULT_PRODUCTS;
-  window.ALL_PRODUCTS = read("impano_products") || DEFAULT_PRODUCTS;   // tout (pour l'admin)
-  window.PRODUCTS = window.ALL_PRODUCTS.filter((p) => !p.hidden);       // visible en boutique
+  window.ALL_PRODUCTS = read("impano_products") || SITE.products || DEFAULT_PRODUCTS;   // tout (pour l'admin)
+  window.PRODUCTS = window.ALL_PRODUCTS.filter((p) => !p.hidden);                       // visible en boutique
+  window.CONTENT = read("impano_content") || SITE.content || {};                        // textes, images, vidéos
+  // Catégories éditables
+  CATEGORIES.forEach((c) => {
+    ["label", "short", "blurb", "img"].forEach((f) => { const v = CONTENT[`cat.${c.id}.${f}`]; if (v) c[f] = v; });
+  });
 })();
 
 window.fmt = (n) => CONFIG.currency + Number(n).toFixed(0);
 window.byId = (id) => ALL_PRODUCTS.find((p) => p.id === id);
+
+/* Champs globaux éditables (apparaissent dans toutes les pages) */
+window.CMS_GLOBAL = [
+  { key: "global.announce", label: "Toutes les pages › Bandeau du haut", type: "text", def: "Chaque pièce est faite main  ✦  Livraison offerte dès {free}" },
+  { key: "global.footer.tag", label: "Pied de page › Slogan", type: "text", def: "Wear the gift\nBe the gift" },
+  { key: "global.footer.blurb", label: "Pied de page › Texte de présentation", type: "long", def: "« Impano » signifie *le don*. Chaque fil que nous nouons est un cadeau — pour celui qui le crée, pour celui qui le porte." },
+  { key: "global.footer.copy", label: "Pied de page › Copyright", type: "text", def: "© 2026 Impano — Lubumbashi, RD Congo. Fait main avec amour." },
+  { key: "global.footer.right", label: "Pied de page › Mention de droite", type: "text", def: "100 % crochet · pièces uniques · slow fashion" }
+];

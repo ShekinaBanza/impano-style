@@ -1,7 +1,7 @@
 /* Impano — service worker : fonctionne hors-ligne pour les pages et images vues */
-const VERSION = "impano-v2";
+const VERSION = "impano-v3";
 const CORE = ["./", "index.html", "boutique.html", "produit.html", "commande.html", "histoire.html",
-  "css/style.css", "js/app.js", "js/data.js", "js/tw-config.js", "manifest.webmanifest",
+  "css/style.css", "js/app.js", "js/data.js", "js/tw-config.js", "data/site.js", "admin.html", "manifest.webmanifest",
   "icons/icon-192.png", "icons/icon-512.png"];
 
 self.addEventListener("install", (e) => {

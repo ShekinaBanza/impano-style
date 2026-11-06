@@ -101,11 +101,15 @@
 </main>
 
 <div id="footer"></div>
+<script src="data/site.js"></script>
 <script src="js/data.js"></script>
 <script src="js/app.js"></script>
 <script>
 document.addEventListener("DOMContentLoaded", () => {
   const form = $("#form");
+  // Pré-remplissage si le client est connecté
+  const fillAccount = () => { const u = Account.user(); if (!u) return; const [pr, ...nm] = u.name.split(" "); if (!form.prenom.value) form.prenom.value = pr; if (!form.nom.value) form.nom.value = nm.join(" "); if (!form.tel.value) form.tel.value = u.phone || ""; if (!form.email.value) form.email.value = u.email; };
+  fillAccount(); document.addEventListener("accountchange", fillAccount);
   // Remplit les prix de livraison (les gabarits ${...} ci-dessus ne sont pas interprétés en HTML)
   $$(".choice input[name=mode]").forEach((r) => {
     const sm = r.parentElement.querySelector("span span");
@@ -160,7 +164,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const msg = `Bonjour Impano 👋\nNouvelle commande *${ref}*\n\n${lines}\n\nSous-total : ${fmt(Cart.subtotal())}\nLivraison : ${s ? fmt(s) : "offerte"}\n*Total : ${fmt(total)}*\n\n👤 ${g("prenom")} ${g("nom")}\n📞 ${g("tel")}\n📍 ${retrait ? "Retrait à l’atelier" : `${g("adresse")}, ${g("quartier")}, ${g("ville")}`}\n💳 ${g("pay")}${g("note") ? "\n📝 " + g("note") : ""}`;
 
     const orders = JSON.parse(localStorage.getItem("impano_orders") || "[]");
-    orders.push({ ref, date: new Date().toISOString(), total, items: Cart.items, client: { prenom: g("prenom"), nom: g("nom"), tel: g("tel"), email: g("email") } });
+    orders.push({ ref, date: new Date().toISOString(), total, items: Cart.items, account: (Account.user() || {}).email || null, client: { prenom: g("prenom"), nom: g("nom"), tel: g("tel"), email: g("email") } });
     localStorage.setItem("impano_orders", JSON.stringify(orders));
 
     $("#d-name").textContent = g("prenom"); $("#d-ref").textContent = ref;
