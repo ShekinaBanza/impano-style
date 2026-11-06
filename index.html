@@ -46,6 +46,26 @@
   <div class="marquee-track animate-marquee" id="marquee"></div>
 </div>
 
+<!-- ================= À LA UNE : TOUT NOUVEAU ================= -->
+<section id="une" class="bg-ink text-cowrie py-20 md:py-28">
+  <div class="max-w-[1500px] mx-auto px-5 md:px-10">
+    <div class="flex flex-wrap items-end justify-between gap-6 mb-12 reveal">
+      <div>
+        <p class="eyebrow text-ember mb-4" data-cms="home.une.eyebrow" data-cms-label="À la une › Sur-titre">Tout nouveau</p>
+        <h2 class="display text-5xl md:text-7xl" data-cms="home.une.title" data-cms-label="À la une › Titre">La nouvelle <span class="italic">collection</span></h2>
+      </div>
+      <a href="boutique" class="btn btn-light">Tout découvrir <svg class="w-6 h-3"><use href="#arrow"/></svg></a>
+    </div>
+    <div id="une-grid" class="grid grid-cols-2 lg:grid-cols-4 gap-x-4 md:gap-x-7 gap-y-12"></div>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-5 mt-16">
+      <div class="relative aspect-[3/4] overflow-hidden bg-bone/10"><video data-auto data-cms-video="home.une.v1" data-cms-label="À la une › Vidéo 1" class="absolute inset-0 w-full h-full object-cover" src="assets/video/n-doker.mp4" muted loop playsinline preload="metadata"></video></div>
+      <div class="relative aspect-[3/4] overflow-hidden bg-bone/10"><video data-auto data-cms-video="home.une.v2" data-cms-label="À la une › Vidéo 2" class="absolute inset-0 w-full h-full object-cover" src="assets/video/n-noms.mp4" muted loop playsinline preload="metadata"></video></div>
+      <div class="relative aspect-[3/4] overflow-hidden bg-bone/10"><video data-auto data-cms-video="home.une.v3" data-cms-label="À la une › Vidéo 3" class="absolute inset-0 w-full h-full object-cover" src="assets/video/n-sac.mp4" muted loop playsinline preload="metadata"></video></div>
+      <div class="relative aspect-[3/4] overflow-hidden bg-bone/10"><video data-auto data-cms-video="home.une.v4" data-cms-label="À la une › Vidéo 4" class="absolute inset-0 w-full h-full object-cover" src="assets/video/n-banane.mp4" muted loop playsinline preload="metadata"></video></div>
+    </div>
+  </div>
+</section>
+
 <!-- ================= CATÉGORIES ================= -->
 <section class="max-w-[1500px] mx-auto px-5 md:px-10 py-24 md:py-36">
   <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-14 reveal">
@@ -245,6 +265,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const fresh = PRODUCTS.filter((p) => p.added).sort((a, b) => b.added - a.added);   // articles ajoutés depuis l'admin : toujours en tête
   const base = picks.length >= 4 ? picks : PRODUCTS.slice(0, 8);
   const list = [...fresh, ...base.filter((p) => !fresh.includes(p))].slice(0, 12);
+  $("#une-grid").innerHTML = fresh.slice(0, 4).map((p, i) => productCard(p, `reveal reveal-d${i}`)).join("");
   $("#rail").innerHTML = list.map((p) => productCard(p, "snap-start shrink-0 w-[72vw] sm:w-[40vw] lg:w-[23%]")).join("");
   const step = () => $("#rail").clientWidth * 0.6;
   $("#next").onclick = () => $("#rail").scrollBy({ left: step(), behavior: "smooth" });
