@@ -7,7 +7,7 @@ with zipfile.ZipFile('impano-hostinger.zip', 'w', zipfile.ZIP_DEFLATED) as z:
         ds[:] = [x for x in ds if x not in skip]
         for f in fs:
             p = os.path.join(d, f); rel = os.path.relpath(p, '.').replace(os.sep, '/')
-            if f in skipf or f.endswith('.sqlite') or (rel.startswith('api/storage/') and f != '.htaccess'): continue
+            if f == 'config.php' or f in skipf or f.endswith('.sqlite') or (rel.startswith('api/storage/') and f != '.htaccess'): continue
             z.write(p, rel); n += 1
 print(n, 'fichiers', round(os.path.getsize('impano-hostinger.zip') / 1e6, 1), 'Mo')
 with zipfile.ZipFile('impano-hostinger.zip') as z:

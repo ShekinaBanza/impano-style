@@ -1,8 +1,12 @@
 <?php
-/* Copiez ce fichier en config.php (sur le serveur) et adaptez-le. config.php n'est jamais publié sur GitHub. */
+/* Copiez ce fichier en api/config.php puis remplissez-le (hPanel → Bases de données → MySQL). Ne jamais publier config.php. */
 return [
   'admin_email'    => 'impano-style@impano.cd',
-  'admin_password' => 'CHANGEZ-MOI',   // utilisé UNE SEULE FOIS pour créer le compte admin à la première visite
-  // Optionnel : dossier de la base SQLite. Le plus sûr = HORS de public_html, ex. '/home/uXXXX/impano-data'
-  'db_dir'         => null,            // null = api/storage (protégé par .htaccess)
+  'admin_password' => 'CHANGEZ-MOI',   // sert uniquement à créer le compte admin à la première visite
+  'db' => [
+    'host' => 'localhost',
+    'name' => 'u123456789_impano',      // nom de la base MySQL
+    'user' => 'u123456789_impano',      // utilisateur MySQL
+    'pass' => 'VOTRE-MOT-DE-PASSE-MYSQL',
+  ],
 ];

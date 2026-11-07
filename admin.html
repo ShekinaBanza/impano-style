@@ -204,7 +204,7 @@
         </ol>
         <p class="mt-4 text-terra">Le jeton reste sur cet appareil. Ne le partagez jamais et utilisez un jeton limité à ce seul dépôt.</p>
       </details></div>
-      <div id="sb-block" class="hidden border border-ink/15 p-6"><button id="diag" type="button" class="btn-line float-right text-xs px-3 py-2 border border-ink/30">Diagnostic</button><p class="eyebrow text-terra mb-2">Stockage sécurisé</p><p class="display text-2xl mb-2">Base de données SQLite connectée ✓</p><p class="text-sm opacity-70 leading-relaxed">Articles, textes, photos, vidéos et commandes sont enregistrés dans votre base. « Publier » met le site à jour <b>immédiatement</b> pour tous les visiteurs, sans GitHub.</p></div>
+      <div id="sb-block" class="hidden border border-ink/15 p-6"><button id="diag" type="button" class="btn-line float-right text-xs px-3 py-2 border border-ink/30">Diagnostic</button><p class="eyebrow text-terra mb-2">Stockage sécurisé</p><p class="display text-2xl mb-2">Base de données MySQL connectée ✓</p><p class="text-sm opacity-70 leading-relaxed">Articles, textes, photos, vidéos et commandes sont enregistrés dans votre base. « Publier » met le site à jour <b>immédiatement</b> pour tous les visiteurs, sans GitHub.</p></div>
     </section>
   </main>
 
@@ -831,7 +831,7 @@ async function publishSB(L) {
   if (error) throw new Error("Base : " + error.message);
   const chk = await sb.from("site_data").select("key,value,updated_at");
   const got = ((chk.data || []).find((r) => r.key === "categories") || {}).value;
-  if (!got || JSON.stringify(got) !== JSON.stringify(cats)) throw new Error("les catégories n’ont pas été enregistrées dans la base — le fichier api/index.php sur le serveur est probablement ancien : renvoyez-le depuis le ZIP.");
+  if (!got || JSON.stringify(got.map((c) => [c.id, c.label])) !== JSON.stringify(cats.map((c) => [c.id, c.label]))) throw new Error("les catégories n’ont pas été enregistrées dans la base — vérifiez la connexion MySQL (api/config.php) et le fichier api/index.php sur le serveur.");
   list = prods; content = cont; CATEGORIES.splice(0, CATEGORIES.length, ...cats); persist(); saveContent(); localStorage.setItem("impano_categories", JSON.stringify(cats)); refreshCat();
   localStorage.setItem("impano_remote", JSON.stringify({ products: prods, categories: cats, content: cont, config: cfg || undefined, updated: now }));
   localStorage.setItem("impano_base", now); localStorage.removeItem("impano_dirty");
@@ -842,7 +842,7 @@ $("#diag").onclick = async () => {
     const r = await fetch((window.ROOT || "/") + "api/index.php?r=ping&t=" + Date.now(), { credentials: "same-origin", headers: { "X-Impano": "1" } }), t = await r.text();
     let j; try { j = JSON.parse(t); } catch (e) { return alert("Le serveur n’a pas renvoyé de JSON (HTTP " + r.status + ").\n" + t.slice(0, 300)); }
     if (j.error || !j.version) return alert("API ANCIENNE : renvoyez api/index.php depuis le ZIP.\n" + (j.error || ""));
-    alert("API version " + j.version + " · PHP " + j.php + "\nÉcriture base : " + (j.ecriture ? "OK" : "IMPOSSIBLE") + "\nConnecté admin : " + (j.admin ? "oui" : "NON") + "\nDonnées : " + Object.entries(j.cles).map(([k, v]) => k + " (" + v.octets + " o, " + v.maj + ")").join(" ; "));
+    alert("API version " + j.version + " · PHP " + j.php + "\nÉcriture base : " + (j.ecriture ? "OK" : "IMPOSSIBLE") + "\nConnecté admin : " + (j.admin ? "oui" : "NON") + "\nDonnées : " + Object.entries(j.cles).map(([k, v]) => k + " (" + v.lignes + " lignes, " + v.maj + ")").join(" ; "));
   } catch (e) { alert("Serveur injoignable : " + e.message); }
 };
 $("#pub-go").onclick = async () => {

@@ -1,4 +1,15 @@
-# Mettre Impano sur Hostinger (PHP + SQLite)
+# Passage à MySQL (Hostinger)
+
+1. hPanel → **Bases de données → Gestion** : créez une base MySQL + un utilisateur (notez le nom de la base, l'utilisateur, le mot de passe).
+2. Dans `public_html/api/config.php` (votre fichier actuel, ne le remplacez pas), ajoutez le bloc `db` (modèle : `api/config.sample.php`).
+3. Envoyez `api/index.php` (et tous les fichiers du ZIP sauf `api/config.php`).
+4. Ouvrez `https://VOTRE-SITE/api/index.php?r=ping` : vous devez voir `"moteur":"MySQL ..."`.
+   Au premier appel, les tables sont créées et l'ancienne base SQLite (`api/storage/impano.sqlite`) est importée automatiquement (articles, catégories, textes, commandes, comptes clients).
+5. Tout est ensuite dans MySQL : tables `products`, `categories`, `content`, `config`, `orders`, `users` (visibles dans phpMyAdmin).
+
+---
+
+# Mettre Impano sur Hostinger (PHP + SQLite (ancien))
 
 Tout le site tourne sur votre hébergement : pages, base de données **SQLite** (un simple fichier), comptes clients, commandes, photos et vidéos envoyées depuis l'admin. Aucun service externe.
 

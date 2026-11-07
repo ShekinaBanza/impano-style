@@ -1,5 +1,5 @@
 <?php
-/* Impano — API (PHP + SQLite). Une seule porte d'entrée : api/index.php?r=<route> */
+/* Impano — API (PHP + MySQL). Une seule porte d'entrée : api/index.php?r=<route> */
 declare(strict_types=1);
 header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: no-store');
@@ -12,31 +12,116 @@ $cfg += ['admin_email' => 'impano-style@impano.cd', 'admin_password' => null, 'd
 function out($data, int $code = 200): void { http_response_code($code); echo json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES); exit; }
 function fail(string $msg, int $code = 400): void { out(['error' => $msg], $code); }
 
-/* ---------- Base SQLite ---------- */
-$dir = $cfg['db_dir'] ?: (__DIR__ . '/storage');
-if (!is_dir($dir)) @mkdir($dir, 0750, true);
+/* ---------- Base MySQL ---------- */
+$c = $cfg['db'] ?? null;
+if (!is_array($c) || empty($c['name']) || empty($c['user'])) fail('MySQL non configuré : renseignez « db » (host, name, user, pass) dans api/config.php.', 500);
 try {
-  $db = new PDO('sqlite:' . $dir . '/impano.sqlite', null, null, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC]);
-  $db->exec('PRAGMA journal_mode=WAL; PRAGMA foreign_keys=ON;');
-} catch (Throwable $e) { fail('Base de données inaccessible : vérifiez les droits d’écriture du dossier api/storage.', 500); }
-$db->exec("CREATE TABLE IF NOT EXISTS users(id INTEGER PRIMARY KEY AUTOINCREMENT, email TEXT UNIQUE COLLATE NOCASE NOT NULL, name TEXT, phone TEXT, pass TEXT NOT NULL, is_admin INTEGER NOT NULL DEFAULT 0, created_at TEXT NOT NULL);
-CREATE TABLE IF NOT EXISTS site_data(key TEXT PRIMARY KEY, value TEXT NOT NULL, updated_at TEXT NOT NULL);
-CREATE TABLE IF NOT EXISTS orders(id INTEGER PRIMARY KEY AUTOINCREMENT, ref TEXT UNIQUE NOT NULL, created_at TEXT NOT NULL, user_id INTEGER, client TEXT NOT NULL, items TEXT NOT NULL, total REAL NOT NULL, shipping REAL, delivery TEXT, payment TEXT, note TEXT, status TEXT NOT NULL DEFAULT 'nouveau', ip TEXT);
-CREATE TABLE IF NOT EXISTS attempts(k TEXT NOT NULL, t INTEGER NOT NULL);
-CREATE INDEX IF NOT EXISTS ix_orders_user ON orders(user_id);
-CREATE INDEX IF NOT EXISTS ix_att ON attempts(k,t);");
+  $db = new PDO('mysql:host=' . ($c['host'] ?? 'localhost') . ';port=' . ($c['port'] ?? 3306) . ';dbname=' . $c['name'] . ';charset=utf8mb4', $c['user'], (string)($c['pass'] ?? ''), [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC, PDO::ATTR_EMULATE_PREPARES => false]);
+} catch (Throwable $e) { fail('Connexion MySQL impossible : vérifiez le nom, l’utilisateur et le mot de passe de la base dans api/config.php.', 500); }
+$T = ' ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci';
+foreach ([
+  "CREATE TABLE IF NOT EXISTS users(id INT AUTO_INCREMENT PRIMARY KEY, email VARCHAR(190) NOT NULL UNIQUE, name VARCHAR(120), phone VARCHAR(40), pass VARCHAR(255) NOT NULL, is_admin TINYINT NOT NULL DEFAULT 0, created_at VARCHAR(40) NOT NULL)$T",
+  "CREATE TABLE IF NOT EXISTS categories(rid INT AUTO_INCREMENT PRIMARY KEY, pos INT NOT NULL DEFAULT 0, id VARCHAR(80) NOT NULL, label VARCHAR(200), short VARCHAR(120), img VARCHAR(600), blurb TEXT, extra LONGTEXT, KEY ix_cid(id))$T",
+  "CREATE TABLE IF NOT EXISTS products(rid INT AUTO_INCREMENT PRIMARY KEY, pos INT NOT NULL DEFAULT 0, id VARCHAR(120) NOT NULL, cat VARCHAR(80), name VARCHAR(240), price DECIMAL(10,2), img VARCHAR(600), gallery LONGTEXT, tag VARCHAR(120), color VARCHAR(200), descr TEXT, details LONGTEXT, sizes LONGTEXT, stock INT NULL, hidden TINYINT NOT NULL DEFAULT 0, added BIGINT NULL, extra LONGTEXT, KEY ix_pid(id), KEY ix_pcat(cat))$T",
+  "CREATE TABLE IF NOT EXISTS content(k VARCHAR(190) PRIMARY KEY, v LONGTEXT, is_json TINYINT NOT NULL DEFAULT 0)$T",
+  "CREATE TABLE IF NOT EXISTS config(k VARCHAR(120) PRIMARY KEY, v LONGTEXT)$T",
+  "CREATE TABLE IF NOT EXISTS meta(k VARCHAR(60) PRIMARY KEY, updated_at VARCHAR(40) NOT NULL)$T",
+  "CREATE TABLE IF NOT EXISTS orders(id INT AUTO_INCREMENT PRIMARY KEY, ref VARCHAR(40) NOT NULL UNIQUE, created_at VARCHAR(40) NOT NULL, user_id INT NULL, client LONGTEXT NOT NULL, items LONGTEXT NOT NULL, total DECIMAL(12,2) NOT NULL, shipping DECIMAL(10,2), delivery VARCHAR(60), payment VARCHAR(60), note TEXT, status VARCHAR(20) NOT NULL DEFAULT 'nouveau', ip VARCHAR(60), KEY ix_orders_user(user_id))$T",
+  "CREATE TABLE IF NOT EXISTS attempts(k VARCHAR(190) NOT NULL, t INT NOT NULL, KEY ix_att(k,t))$T",
+] as $q) $db->exec($q);
+
+const PCOLS = ['id', 'cat', 'name', 'price', 'img', 'gallery', 'tag', 'color', 'desc', 'details', 'sizes', 'stock', 'hidden', 'added'];
+const CCOLS = ['id', 'label', 'short', 'img', 'blurb'];
+function J($v): string { return json_encode($v, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES); }
+function touchMeta(PDO $db, string $k): void { $db->prepare('INSERT INTO meta(k,updated_at) VALUES(?,?) ON DUPLICATE KEY UPDATE updated_at=VALUES(updated_at)')->execute([$k, gmdate('c')]); }
+
+/* Écrit une liste (catégories / articles / textes / réglages) dans ses vraies tables MySQL */
+function saveKey(PDO $db, string $key, $val): void {
+  if ($key === 'categories') {
+    if (!is_array($val)) fail('Catégories invalides.');
+    $db->exec('DELETE FROM categories'); $st = $db->prepare('INSERT INTO categories(pos,id,label,short,img,blurb,extra) VALUES(?,?,?,?,?,?,?)');
+    foreach (array_values($val) as $i => $c) {
+      if (!is_array($c) || empty($c['id'])) continue; $x = array_diff_key($c, array_flip(CCOLS));
+      $st->execute([$i, (string)$c['id'], (string)($c['label'] ?? ''), (string)($c['short'] ?? ''), (string)($c['img'] ?? ''), (string)($c['blurb'] ?? ''), $x ? J($x) : null]);
+    }
+  } elseif ($key === 'products') {
+    if (!is_array($val)) fail('Articles invalides.');
+    $db->exec('DELETE FROM products'); $st = $db->prepare('INSERT INTO products(pos,id,cat,name,price,img,gallery,tag,color,descr,details,sizes,stock,hidden,added,extra) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)');
+    foreach (array_values($val) as $i => $p) {
+      if (!is_array($p) || !isset($p['id'])) continue; $x = array_diff_key($p, array_flip(PCOLS));
+      $stock = (isset($p['stock']) && $p['stock'] !== '' && $p['stock'] !== null) ? (int)$p['stock'] : null;
+      $st->execute([$i, (string)$p['id'], (string)($p['cat'] ?? ''), (string)($p['name'] ?? ''), (float)($p['price'] ?? 0), (string)($p['img'] ?? ''),
+        isset($p['gallery']) ? J($p['gallery']) : null, (string)($p['tag'] ?? ''), (string)($p['color'] ?? ''), (string)($p['desc'] ?? ''),
+        isset($p['details']) ? J($p['details']) : null, isset($p['sizes']) ? J($p['sizes']) : null, $stock, !empty($p['hidden']) ? 1 : 0,
+        isset($p['added']) ? (int)$p['added'] : null, $x ? J($x) : null]);
+    }
+  } elseif ($key === 'content') {
+    $db->exec('DELETE FROM content'); $st = $db->prepare('INSERT INTO content(k,v,is_json) VALUES(?,?,?)');
+    foreach ((array)$val as $k => $v) $st->execute([(string)$k, is_string($v) ? $v : J($v), is_string($v) ? 0 : 1]);
+  } elseif ($key === 'config') {
+    $db->exec('DELETE FROM config'); $st = $db->prepare('INSERT INTO config(k,v) VALUES(?,?)');
+    foreach ((array)$val as $k => $v) $st->execute([(string)$k, J($v)]);
+  } else fail('Clé inconnue : ' . $key);
+  touchMeta($db, $key);
+}
+/* Relit une liste depuis MySQL, dans le format que le site attend */
+function loadKey(PDO $db, string $key) {
+  $nz = fn($s) => ($s === null || $s === '') ? null : json_decode($s, true);
+  if ($key === 'categories') {
+    $o = [];
+    foreach ($db->query('SELECT * FROM categories ORDER BY pos,rid')->fetchAll() as $r) {
+      $c = ['id' => $r['id'], 'label' => $r['label'], 'short' => $r['short'], 'img' => $r['img'], 'blurb' => $r['blurb']];
+      if ($r['extra']) $c += $nz($r['extra']) ?: []; $o[] = $c;
+    }
+    return $o;
+  }
+  if ($key === 'products') {
+    $o = [];
+    foreach ($db->query('SELECT * FROM products ORDER BY pos,rid')->fetchAll() as $r) {
+      $p = ['id' => $r['id'], 'cat' => $r['cat'], 'name' => $r['name'], 'price' => $r['price'] + 0, 'img' => $r['img']];
+      if ($r['gallery'] !== null) $p['gallery'] = $nz($r['gallery']);
+      if ($r['tag'] !== '') $p['tag'] = $r['tag'];
+      if ($r['color'] !== '') $p['color'] = $r['color'];
+      if ($r['descr'] !== '') $p['desc'] = $r['descr'];
+      if ($r['details'] !== null) $p['details'] = $nz($r['details']);
+      if ($r['sizes'] !== null) $p['sizes'] = $nz($r['sizes']);
+      if ($r['stock'] !== null) $p['stock'] = (int)$r['stock'];
+      if ($r['hidden']) $p['hidden'] = true;
+      if ($r['added'] !== null) $p['added'] = (int)$r['added'];
+      if ($r['extra']) $p += $nz($r['extra']) ?: [];
+      $o[] = $p;
+    }
+    return $o;
+  }
+  if ($key === 'content') { $o = []; foreach ($db->query('SELECT * FROM content')->fetchAll() as $r) $o[$r['k']] = $r['is_json'] ? json_decode($r['v'], true) : $r['v']; return $o ?: new stdClass; }
+  if ($key === 'config') { $o = []; foreach ($db->query('SELECT * FROM config')->fetchAll() as $r) $o[$r['k']] = json_decode($r['v'], true); return $o ?: null; }
+  return null;
+}
 
 /* Compte administrateur créé une seule fois, à partir de config.php */
 if ((int)$db->query('SELECT COUNT(*) FROM users WHERE is_admin=1')->fetchColumn() === 0 && !empty($cfg['admin_password']) && $cfg['admin_password'] !== 'CHANGEZ-MOI') {
-  $db->prepare('INSERT OR REPLACE INTO users(email,name,pass,is_admin,created_at) VALUES(?,?,?,1,?)')
+  $db->prepare('REPLACE INTO users(email,name,pass,is_admin,created_at) VALUES(?,?,?,1,?)')
      ->execute([strtolower($cfg['admin_email']), 'Administrateur', password_hash($cfg['admin_password'], PASSWORD_DEFAULT), gmdate('c')]);
 }
 
-/* Catalogue d'origine : copié UNE SEULE FOIS dans la base (ensuite la base fait foi et l'admin modifie tout) */
-if (is_file(__DIR__ . '/seed.json') && (int)$db->query("SELECT COUNT(*) FROM site_data WHERE key IN ('products','categories','config')")->fetchColumn() < 3) {
-  $seed = json_decode((string)file_get_contents(__DIR__ . '/seed.json'), true);
-  $ins = $db->prepare('INSERT OR IGNORE INTO site_data(key,value,updated_at) VALUES(?,?,?)');
-  foreach (['products', 'categories', 'config'] as $k) if (!empty($seed[$k])) $ins->execute([$k, json_encode($seed[$k], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), gmdate('c')]);
+/* Première installation : import de l'ancienne base SQLite si elle existe, sinon catalogue d'origine (seed.json) */
+if ((int)$db->query('SELECT COUNT(*) FROM meta')->fetchColumn() === 0) {
+  $old = ($cfg['db_dir'] ?: (__DIR__ . '/storage')) . '/impano.sqlite';
+  $done = false;
+  if (is_file($old) && in_array('sqlite', PDO::getAvailableDrivers(), true)) {
+    try {
+      $lite = new PDO('sqlite:' . $old, null, null, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC]);
+      foreach ($lite->query('SELECT key,value FROM site_data')->fetchAll() as $r) { saveKey($db, $r['key'], json_decode($r['value'], true)); $done = true; }
+      $ins = $db->prepare('INSERT IGNORE INTO orders(ref,created_at,user_id,client,items,total,shipping,delivery,payment,note,status,ip) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)');
+      foreach ($lite->query('SELECT * FROM orders')->fetchAll() as $o) $ins->execute([$o['ref'], $o['created_at'], null, $o['client'], $o['items'], $o['total'], $o['shipping'], $o['delivery'], $o['payment'], $o['note'], $o['status'], $o['ip']]);
+      $iu = $db->prepare('INSERT IGNORE INTO users(email,name,phone,pass,is_admin,created_at) VALUES(?,?,?,?,0,?)');
+      foreach ($lite->query('SELECT * FROM users WHERE is_admin=0')->fetchAll() as $u) $iu->execute([$u['email'], $u['name'], $u['phone'], $u['pass'], $u['created_at']]);
+    } catch (Throwable $e) { /* on retombe sur le catalogue d'origine */ }
+  }
+  if (!$done && is_file(__DIR__ . '/seed.json')) {
+    $seed = json_decode((string)file_get_contents(__DIR__ . '/seed.json'), true);
+    foreach (['products', 'categories', 'config'] as $k) if (!empty($seed[$k])) saveKey($db, $k, $seed[$k]);
+  }
 }
 
 /* ---------- Session ---------- */
@@ -76,17 +161,18 @@ switch ($route) {
 
   /* ----- Catalogue public ----- */
   case 'site':
-    $rows = $db->query('SELECT key,value,updated_at FROM site_data')->fetchAll();
-    foreach ($rows as &$r) $r['value'] = json_decode($r['value'], true);
+    $m = $db->query('SELECT k,updated_at FROM meta')->fetchAll(PDO::FETCH_KEY_PAIR); $rows = [];
+    foreach (['products', 'categories', 'content', 'config'] as $k) if (isset($m[$k])) $rows[] = ['key' => $k, 'value' => loadKey($db, $k), 'updated_at' => $m[$k]];
     out($rows);
 
   case 'categories':
-    $v = $db->query("SELECT value FROM site_data WHERE key='categories'")->fetchColumn();
-    out(['categories' => $v ? json_decode($v, true) : null]);
+    out(['categories' => loadKey($db, 'categories')]);
 
   case 'ping':
-    $k = []; foreach ($db->query('SELECT key,updated_at,length(value) AS n FROM site_data')->fetchAll() as $r) $k[$r['key']] = ['maj' => $r['updated_at'], 'octets' => (int)$r['n']];
-    out(['version' => 26, 'php' => PHP_VERSION, 'cles' => $k, 'ecriture' => is_writable(__DIR__ . '/storage'), 'admin' => (bool)(($u = me($db)) && !empty($u['is_admin']))]);
+    $k = [];
+    foreach (['products', 'categories', 'content', 'config'] as $t) $k[$t] = ['lignes' => (int)$db->query("SELECT COUNT(*) FROM `$t`")->fetchColumn()];
+    foreach ($db->query('SELECT k,updated_at FROM meta')->fetchAll() as $r) $k[$r['k']]['maj'] = $r['updated_at'];
+    out(['version' => 30, 'moteur' => 'MySQL ' . $db->query('SELECT VERSION()')->fetchColumn(), 'php' => PHP_VERSION, 'cles' => $k, 'ecriture' => true, 'admin' => (bool)(($u = me($db)) && !empty($u['is_admin']))]);
 
   /* ----- Comptes ----- */
   case 'me': $u = me($db); out(['user' => $u ? userOut($u) : null]);
@@ -153,13 +239,9 @@ switch ($route) {
   /* ----- Publication du catalogue (admin) ----- */
   case 'publish':
     needAdmin($db); $rows = body()['rows'] ?? []; if (!is_array($rows) || !$rows) fail('Rien à enregistrer.');
-    $st = $db->prepare('INSERT INTO site_data(key,value,updated_at) VALUES(?,?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value, updated_at=excluded.updated_at');
-    $saved = [];
-    foreach ($rows as $r) {
-      $k = $r['key'] ?? '';
-      if (!in_array($k, ['products', 'categories', 'content', 'config'], true)) fail('Clé inconnue : ' . $k);
-      $st->execute([$k, json_encode($r['value'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), gmdate('c')]); $saved[] = $k;
-    }
+    $saved = []; $db->beginTransaction();
+    try { foreach ($rows as $r) { $k = $r['key'] ?? ''; saveKey($db, $k, $r['value'] ?? null); $saved[] = $k; } $db->commit(); }
+    catch (Throwable $e) { if ($db->inTransaction()) $db->rollBack(); fail('Enregistrement impossible : ' . $e->getMessage(), 500); }
     out(['ok' => true, 'saved' => $saved]);
 
   /* ----- Envoi de photos / vidéos (admin) ----- */
