@@ -228,6 +228,13 @@ const DEFAULT_PRODUCTS = [
   const storedCats = read("impano_categories") || REMOTE.categories || SITE.categories;
   window.CATEGORIES = JSON.parse(JSON.stringify(storedCats || window.DEFAULT_CATEGORIES));
   window.ALL_PRODUCTS = read("impano_products") || REMOTE.products || SITE.products || DEFAULT_PRODUCTS;   // tout (pour l'admin)
+  /* Un article dont la catégorie n'existe plus (ex. supprimée par erreur) la fait réapparaître au lieu d'être invisible */
+  window.ALL_PRODUCTS.forEach((p) => {
+    if (p.cat && !window.CATEGORIES.some((c) => c.id === p.cat)) {
+      const lbl = p.cat.replace(/-/g, " ").replace(/^./, (m) => m.toUpperCase());
+      window.CATEGORIES.push({ id: p.cat, label: lbl, short: lbl, img: p.img || "icons/icon-512.png", blurb: "Collection faite main." });
+    }
+  });
   window.PRODUCTS = window.ALL_PRODUCTS.filter((p) => !p.hidden).map((p) => (p.stock === 0 || p.stock === "0") ? Object.assign({}, p, { soldout: true }) : p);                       // visible en boutique
   window.CONTENT = read("impano_content") || REMOTE.content || SITE.content || {};                        // textes, images, vidéos
   // Catégories éditables
