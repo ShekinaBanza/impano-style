@@ -204,7 +204,7 @@
         </ol>
         <p class="mt-4 text-terra">Le jeton reste sur cet appareil. Ne le partagez jamais et utilisez un jeton limité à ce seul dépôt.</p>
       </details></div>
-      <div id="sb-block" class="hidden border border-ink/15 p-6"><p class="eyebrow text-terra mb-2">Stockage sécurisé</p><p class="display text-2xl mb-2">Base de données SQLite connectée ✓</p><p class="text-sm opacity-70 leading-relaxed">Articles, textes, photos, vidéos et commandes sont enregistrés dans votre base. « Publier » met le site à jour <b>immédiatement</b> pour tous les visiteurs, sans GitHub.</p></div>
+      <div id="sb-block" class="hidden border border-ink/15 p-6"><button id="diag" type="button" class="btn-line float-right text-xs px-3 py-2 border border-ink/30">Diagnostic</button><p class="eyebrow text-terra mb-2">Stockage sécurisé</p><p class="display text-2xl mb-2">Base de données SQLite connectée ✓</p><p class="text-sm opacity-70 leading-relaxed">Articles, textes, photos, vidéos et commandes sont enregistrés dans votre base. « Publier » met le site à jour <b>immédiatement</b> pour tous les visiteurs, sans GitHub.</p></div>
     </section>
   </main>
 
@@ -835,6 +835,19 @@ async function publishSB(L) {
   localStorage.setItem("impano_base", now); localStorage.removeItem("impano_dirty");
   L("\n✔ Publié : visible immédiatement par tous vos clients.");
 }
+$("#diag").onclick = async () => {
+  try {
+    const r = await fetch((window.ROOT || "/") + "api/index.php?r=ping&t=" + Date.now(), { credentials: "same-origin", headers: { "X-Impano": "1" } }), t = await r.text();
+    let j; try { j = JSON.parse(t); } catch (e) { return alert("Le serveur n’a pas renvoyé de JSON (HTTP " + r.status + ").
+" + t.slice(0, 300)); }
+    if (j.error || !j.version) return alert("API ANCIENNE : renvoyez api/index.php depuis le ZIP.
+" + (j.error || ""));
+    alert("API version " + j.version + " · PHP " + j.php + "
+Écriture base : " + (j.ecriture ? "OK" : "IMPOSSIBLE") + "
+Connecté admin : " + (j.admin ? "oui" : "NON") + "
+Données : " + Object.entries(j.cles).map(([k, v]) => k + " (" + v.octets + " o, " + v.maj + ")").join(" ; "));
+  } catch (e) { alert("Serveur injoignable : " + e.message); }
+};
 $("#pub-go").onclick = async () => {
   const log = $("#plog"); log.classList.remove("hidden"); log.textContent = ""; const L = (m) => { log.textContent += m + "\n"; log.scrollTop = log.scrollHeight; };
   $("#pub-go").disabled = true;
