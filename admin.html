@@ -676,7 +676,7 @@ async function syncRemote() {
   const o = {}; let up = ""; data.forEach((r) => { o[r.key] = r.value; if (r.updated_at > up) up = r.updated_at; });
   if (up > (localStorage.getItem("impano_base") || "")) {
     localStorage.setItem("impano_remote", JSON.stringify({ products: o.products, categories: o.categories, content: o.content, config: o.config, updated: up }));
-    ["impano_products", "impano_content", "impano_config", "impano_categories"].forEach((k) => localStorage.removeItem(k));
+    ["impano_products", "impano_content", "impano_config"].concat(o.categories ? ["impano_categories"] : []).forEach((k) => localStorage.removeItem(k));
     localStorage.setItem("impano_base", up); sessionStorage.setItem("impano_synced", "1"); location.reload();
   }
 }
