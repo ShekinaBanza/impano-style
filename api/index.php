@@ -36,7 +36,7 @@ if ((int)$db->query('SELECT COUNT(*) FROM users WHERE is_admin=1')->fetchColumn(
 if ((int)$db->query("SELECT COUNT(*) FROM site_data WHERE key='products'")->fetchColumn() === 0 && is_file(__DIR__ . '/seed.json')) {
   $seed = json_decode((string)file_get_contents(__DIR__ . '/seed.json'), true);
   $ins = $db->prepare('INSERT OR IGNORE INTO site_data(key,value,updated_at) VALUES(?,?,?)');
-  foreach (['products', 'config'] as $k) if (!empty($seed[$k])) $ins->execute([$k, json_encode($seed[$k], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), gmdate('c')]);
+  foreach (['products', 'categories', 'config'] as $k) if (!empty($seed[$k])) $ins->execute([$k, json_encode($seed[$k], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), gmdate('c')]);
 }
 
 /* ---------- Session ---------- */
@@ -146,7 +146,7 @@ switch ($route) {
   case 'publish':
     needAdmin($db); $rows = body()['rows'] ?? []; if (!is_array($rows) || !$rows) fail('Rien à enregistrer.');
     $st = $db->prepare('INSERT INTO site_data(key,value,updated_at) VALUES(?,?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value, updated_at=excluded.updated_at');
-    foreach ($rows as $r) { if (!in_array($r['key'] ?? '', ['products', 'content', 'config'], true)) continue; $st->execute([$r['key'], json_encode($r['value'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), gmdate('c')]); }
+    foreach ($rows as $r) { if (!in_array($r['key'] ?? '', ['products', 'categories', 'content', 'config'], true)) continue; $st->execute([$r['key'], json_encode($r['value'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), gmdate('c')]); }
     out(['ok' => true]);
 
   /* ----- Envoi de photos / vidéos (admin) ----- */

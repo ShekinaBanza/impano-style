@@ -1,6 +1,6 @@
 import zipfile, os
 skip = {'.git', 'Old image', 'Nouveau Photo', '.claude', 'supabase', '__pycache__'}
-skipf = {'serve.py', 'impano-hostinger.zip', '.gitignore', '.build-zip.py', '.build-seed.js'}
+skipf = {'serve.py', 'impano-hostinger.zip', '.gitignore', '.build-zip.py', '.build-seed.js', 'logo.PNG'}
 n = 0
 with zipfile.ZipFile('impano-hostinger.zip', 'w', zipfile.ZIP_DEFLATED) as z:
     for d, ds, fs in os.walk('.'):

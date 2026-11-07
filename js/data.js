@@ -12,7 +12,7 @@ window.CONFIG = {
   instagram: "https://www.instagram.com/"
 };
 
-window.CATEGORIES = [
+window.DEFAULT_CATEGORIES = [
   { id: "bonnets", label: "Bonnets & Chapeaux", short: "Bonnets", img: "assets/img/p32.jpg", blurb: "Crochet ajouré, cauris et motifs ancestraux." },
   { id: "sacs", label: "Sacs bananes", short: "Sacs", img: "assets/img/p20.jpg", blurb: "Le sac de tous les jours, tricoté main." },
   { id: "pret-a-porter", label: "Prêt-à-porter crochet", short: "Prêt-à-porter", img: "assets/img/p07.jpg", blurb: "Ensembles sculptés fil après fil." }
@@ -225,11 +225,13 @@ const DEFAULT_PRODUCTS = [
   const cfg = read("impano_config") || REMOTE.config || SITE.config;
   if (cfg) Object.assign(CONFIG, cfg, { shipping: Object.assign({}, CONFIG.shipping, cfg.shipping || {}) });
   window.DEFAULT_PRODUCTS = DEFAULT_PRODUCTS;
+  const storedCats = read("impano_categories") || REMOTE.categories || SITE.categories;
+  window.CATEGORIES = JSON.parse(JSON.stringify(storedCats || window.DEFAULT_CATEGORIES));
   window.ALL_PRODUCTS = read("impano_products") || REMOTE.products || SITE.products || DEFAULT_PRODUCTS;   // tout (pour l'admin)
-  window.PRODUCTS = window.ALL_PRODUCTS.filter((p) => !p.hidden);                       // visible en boutique
+  window.PRODUCTS = window.ALL_PRODUCTS.filter((p) => !p.hidden).map((p) => (p.stock === 0 || p.stock === "0") ? Object.assign({}, p, { soldout: true }) : p);                       // visible en boutique
   window.CONTENT = read("impano_content") || REMOTE.content || SITE.content || {};                        // textes, images, vidéos
   // Catégories éditables
-  CATEGORIES.forEach((c) => {
+  if (!storedCats) CATEGORIES.forEach((c) => {   // anciennes modifications de textes (avant la gestion des catégories)
     ["label", "short", "blurb", "img"].forEach((f) => { const v = CONTENT[`cat.${c.id}.${f}`]; if (v) c[f] = v; });
   });
 })();

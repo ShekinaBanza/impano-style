@@ -97,10 +97,12 @@ body::after {
 /* Logo Impano : gothique large, lettres collées, © en exposant */
 .logo { font-family: "Syne", "Montserrat", sans-serif; font-weight: 800; letter-spacing: -.075em; text-transform: lowercase; line-height: .85; display: inline-block; position: relative; padding-right: .22em; }
 .logo::after { content: "©"; position: absolute; right: 0; top: .08em; font-size: .17em; font-weight: 600; letter-spacing: 0; line-height: 1; border: 0; }
+/* Vrai logo (assets/logo/impano-logo.png) : forme utilisée comme masque, il prend la couleur du texte (clair, sombre, accueil) */
+.logo-img { display: block; aspect-ratio: 2040 / 498; background-color: currentColor; -webkit-mask: url(../assets/logo/impano-logo.png) center / contain no-repeat; mask: url(../assets/logo/impano-logo.png) center / contain no-repeat; }
 .logo-tag { font-family: "Syne", sans-serif; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; }
 
 /* Logo géant de l'accueil : toujours entièrement visible */
-.logo-hero { font-size: min(calc((100vw - 2.5rem) / 6.1), 20rem); text-shadow: 0 2px 40px rgba(0,0,0,.25); }
+.logo-hero { width: min(calc(100vw - 2.5rem), 64rem); filter: drop-shadow(0 2px 30px rgba(0,0,0,.3)); }
 #header.on-hero:not(.solid) .hlogo { opacity: 0; pointer-events: none; }
 .hlogo { transition: opacity .5s; }
 
@@ -117,7 +119,7 @@ body::after {
 
 /* Logo du pied de page : s'adapte à la largeur de sa colonne */
 .logo-foot-wrap { container-type: inline-size; }
-.logo-foot { font-size: calc(100cqw / 6.2); }
+.logo-foot { width: 100%; }
 
 /* Bouton thème : lune en clair, soleil en sombre */
 .theme-sun { display: none; }

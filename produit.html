@@ -69,6 +69,7 @@ document.addEventListener("DOMContentLoaded", () => {
       <p class="eyebrow opacity-55 mb-4">${cat.label}</p>
       <h1 class="display text-5xl md:text-7xl italic mb-5">${p.name}</h1>
       <p class="text-2xl mb-8">${fmt(p.price)} <span class="text-xs opacity-50 tracking-widest uppercase ml-2">${CONFIG.currency === "$" ? "USD" : ""}</span></p>
+      ${p.stock > 0 && p.stock <= 3 ? `<p class="eyebrow text-terra mb-6">Plus que ${p.stock} en stock</p>` : ""}
       <p class="leading-relaxed opacity-80 mb-8">${p.desc}</p>
 
       <p class="field-label mb-3">Couleur · <span class="opacity-100">${p.color}</span></p>

@@ -20,7 +20,7 @@
 <!-- ============ CONNEXION ============ -->
 <section id="login" class="min-h-screen grid place-items-center px-5 bg-ink text-cowrie">
   <form id="login-form" class="w-full max-w-sm text-center">
-    <span class="logo text-6xl block mb-3">impano</span>
+    <span class="logo-img w-56 mx-auto mb-5" role="img" aria-label="Impano"></span>
     <p class="logo-tag text-[.6rem] opacity-60 mb-12">Espace administration</p>
     <input id="em" type="email" placeholder="Email administrateur" autocomplete="username" class="field text-center !border-cowrie/40 text-cowrie placeholder:text-cowrie/40 mb-4 hidden">
     <input id="pw" type="password" placeholder="Mot de passe" autocomplete="current-password" class="field text-center !border-cowrie/40 text-cowrie placeholder:text-cowrie/40">
@@ -34,14 +34,16 @@
 <div id="app" class="hidden">
   <header class="bg-ink text-cowrie sticky top-0 z-40">
     <div class="max-w-[1300px] mx-auto px-5 h-16 flex items-center justify-between">
-      <div class="flex items-baseline gap-4"><a href="./" class="logo text-3xl">impano</a><span class="logo-tag text-[.55rem] opacity-60 hidden sm:inline">Administration</span></div>
+      <div class="flex items-baseline gap-4"><a href="./" class="logo-img w-28" aria-label="Impano — voir le site"></a><span class="logo-tag text-[.55rem] opacity-60 hidden sm:inline">Administration</span></div>
       <div class="flex items-center gap-5 eyebrow"><button id="dirty" class="hidden bg-terra text-cowrie px-3 py-2 !text-[.6rem]">● Non publié — Publier</button><a href="./" target="_blank" class="ulink hidden sm:inline">Voir le site ↗</a><button id="logout" class="ulink">Quitter</button></div>
     </div>
   </header>
 
   <main class="max-w-[1300px] mx-auto px-5 py-10">
     <nav class="flex gap-6 md:gap-8 eyebrow border-b border-ink/10 mb-10 overflow-x-auto whitespace-nowrap no-bar">
-      <button class="tab on pb-4" data-t="articles">Articles</button>
+      <button class="tab on pb-4" data-t="dash">Tableau de bord</button>
+      <button class="tab pb-4" data-t="articles">Articles</button>
+      <button class="tab pb-4" data-t="cats">Catégories</button>
       <button class="tab pb-4" data-t="content">Contenu du site</button>
       <button class="tab pb-4" data-t="orders">Commandes <span id="oc" class="ml-1 bg-terra text-cowrie rounded-full px-2 py-0.5 !text-[.6rem]"></span></button>
       <button class="tab pb-4" data-t="settings">Paramètres</button>
@@ -49,11 +51,31 @@
     </nav>
 
     <!-- Articles -->
-    <section id="t-articles">
+    <section id="t-dash">
+      <div class="flex flex-wrap items-end justify-between gap-4 mb-8"><div><h1 class="display text-5xl italic">Tableau de bord</h1><p class="text-sm opacity-60 mt-1">L’état de votre boutique en un coup d’œil.</p></div><button id="dash-refresh" class="btn btn-ghost !py-3">Actualiser</button></div>
+      <div id="kpis" class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10"></div>
+      <div class="grid lg:grid-cols-12 gap-8">
+        <div class="lg:col-span-5"><h2 class="eyebrow mb-4">À faire / à vérifier</h2><div id="todo" class="space-y-3"></div></div>
+        <div class="lg:col-span-4"><h2 class="eyebrow mb-4">Articles les plus commandés</h2><div id="top" class="space-y-3 text-sm"></div>
+          <h2 class="eyebrow mt-10 mb-4">Articles par catégorie</h2><div id="bycat" class="space-y-3 text-sm"></div></div>
+        <div class="lg:col-span-3"><h2 class="eyebrow mb-4">Dernières commandes</h2><div id="recent" class="space-y-3 text-sm"></div></div>
+      </div>
+    </section>
+
+    <!-- Catégories -->
+    <section id="t-cats" class="hidden">
+      <div class="flex flex-wrap items-end justify-between gap-4 mb-8"><div><h1 class="display text-5xl italic">Catégories</h1><p class="text-sm opacity-60 mt-1 max-w-xl">Créez, renommez, réordonnez vos catégories. Elles apparaissent automatiquement dans le menu, la boutique, l’accueil et la recherche.</p></div><button id="cat-add" class="btn btn-ink !py-3">+ Nouvelle catégorie</button></div>
+      <div id="catlist" class="grid md:grid-cols-2 gap-6"></div>
+    </section>
+
+    <section id="t-articles" class="hidden">
       <div class="flex flex-wrap gap-4 items-center justify-between mb-8">
         <div><h1 class="display text-5xl italic">Articles</h1><p id="acount" class="text-sm opacity-60 mt-1"></p></div>
         <div class="flex flex-wrap gap-3">
-          <input id="q" placeholder="Rechercher…" class="field !w-48 !py-2">
+          <input id="q" placeholder="Rechercher…" class="field !w-44 !py-2">
+          <select id="fcat" class="field !w-auto !py-2"></select>
+          <select id="fstate" class="field !w-auto !py-2"><option value="">Tous les états</option><option value="soldout">Épuisés</option><option value="hidden">Masqués</option><option value="low">Stock bas (≤ 3)</option><option value="nophoto">Sans photo</option><option value="nodesc">Sans description</option></select>
+          <select id="fsort" class="field !w-auto !py-2"><option value="new">Plus récents</option><option value="name">Nom A→Z</option><option value="asc">Prix croissant</option><option value="desc">Prix décroissant</option></select>
           <button id="add-new" class="btn btn-ink !py-3">+ Nouvel article</button>
         </div>
       </div>
@@ -74,7 +96,7 @@
 
     <!-- Commandes -->
     <section id="t-orders" class="hidden">
-      <div class="flex flex-wrap items-end justify-between gap-4 mb-8"><div><h1 class="display text-5xl italic mb-2">Commandes</h1><p class="text-sm opacity-60">Chaque commande est aussi envoyée sur WhatsApp. Changez son statut au fil du traitement.</p></div><button id="orefresh" class="btn btn-ghost !py-3">Actualiser</button></div>
+      <div class="flex flex-wrap items-end justify-between gap-4 mb-8"><div><h1 class="display text-5xl italic mb-2">Commandes</h1><p class="text-sm opacity-60">Chaque commande est aussi envoyée sur WhatsApp. Changez son statut au fil du traitement.</p></div><div class="flex gap-3"><button id="oexport" class="btn btn-ghost !py-3">Exporter (CSV)</button><button id="orefresh" class="btn btn-ghost !py-3">Actualiser</button></div></div>
       <div id="olist" class="space-y-4"></div>
     </section>
 
@@ -153,6 +175,7 @@
       <label class="block"><span class="field-label">Catégorie</span><select name="cat" class="field"></select></label>
       <label class="block"><span class="field-label">Étiquette</span><input name="tag" placeholder="Pièce unique, Nouveau…" class="field"></label>
       <label class="block"><span class="field-label">Couleur</span><input name="color" class="field"></label>
+      <label class="block"><span class="field-label">Stock (vide = illimité, 0 = épuisé)</span><input name="stock" type="number" min="0" step="1" class="field"></label>
     </div>
     <label class="block"><span class="field-label">Tailles (séparées par des virgules — vide si aucune)</span><input name="sizes" placeholder="S, M, L, XL" class="field"></label>
     <label class="block"><span class="field-label">Description</span><textarea name="desc" rows="3" class="field resize-none"></textarea></label>
@@ -218,46 +241,64 @@ function persist() {
   try { localStorage.setItem("impano_products", JSON.stringify(list)); markDirty(); return true; }
   catch (e) { alert("Stockage plein : les photos sont trop nombreuses ou trop lourdes. Supprimez des photos/articles ou exportez votre sauvegarde."); return false; }
 }
-const CAT = Object.fromEntries(CATEGORIES.map((c) => [c.id, c.short]));
+let CAT = {};
+const refreshCat = () => { CAT = Object.fromEntries(CATEGORIES.map((c) => [c.id, c.short || c.label])); };
+refreshCat();
+function fillFilters() {
+  const v = $("#fcat").value; $("#fcat").innerHTML = '<option value="">Toutes les catégories</option>' + CATEGORIES.map((c) => `<option value="${c.id}">${esc(c.short || c.label)}</option>`).join(""); $("#fcat").value = v;
+}
 
 function init() {
-  $("#m-title"); $("[name=cat]").innerHTML = CATEGORIES.map((c) => `<option value="${c.id}">${c.label}</option>`).join("");
+  $("#m-title");
   if (!localStorage.getItem("impano_merged_n1") && localStorage.getItem("impano_products")) {
     const have = new Set(list.map((p) => p.id)), add = DEFAULT_PRODUCTS.filter((p) => p.added && !have.has(p.id));
     if (add.length) { list.unshift(...add.map((p) => JSON.parse(JSON.stringify(p)))); persist(); }
   }
   localStorage.setItem("impano_merged_n1", "1");
-  syncPublished(); drawList(); drawOrders(); fillSettings(); drawDirty();
+  syncPublished(); refreshCat(); fillFilters(); drawList(); drawOrders().then(drawDash); fillSettings(); drawDirty();
   $$(".tab").forEach((b) => b.onclick = () => {
     $$(".tab").forEach((x) => x.classList.toggle("on", x === b));
-    ["articles", "content", "orders", "settings", "publish"].forEach((t) => $("#t-" + t).classList.toggle("hidden", t !== b.dataset.t));
-    if (b.dataset.t === "content") drawContent(); if (b.dataset.t === "publish") drawPublish();
+    ["dash", "articles", "cats", "content", "orders", "settings", "publish"].forEach((t) => $("#t-" + t).classList.toggle("hidden", t !== b.dataset.t));
+    if (b.dataset.t === "dash") drawDash(); if (b.dataset.t === "cats") drawCats(); if (b.dataset.t === "content") drawContent(); if (b.dataset.t === "publish") drawPublish();
   });
 }
 
 /* ---------- Liste des articles ---------- */
 function drawList() {
   const q = $("#q").value.toLowerCase();
-  const rows = list.filter((p) => p.name.toLowerCase().includes(q));
+  const fc = $("#fcat").value, fs = $("#fstate").value, so = $("#fsort").value;
+  let rows = list.filter((p) => p.name.toLowerCase().includes(q) && (!fc || p.cat === fc) && (!fs || (fs === "soldout" ? p.soldout || p.stock === 0 : fs === "hidden" ? p.hidden : fs === "low" ? (p.stock != null && p.stock !== "" && p.stock <= 3) : fs === "nophoto" ? !p.img : !(p.desc || "").trim())));
+  if (so === "name") rows = [...rows].sort((a, b) => a.name.localeCompare(b.name, "fr"));
+  if (so === "asc") rows = [...rows].sort((a, b) => a.price - b.price);
+  if (so === "desc") rows = [...rows].sort((a, b) => b.price - a.price);
   $("#acount").textContent = `${list.length} articles · ${list.filter((p) => p.hidden).length} masqués · ${list.filter((p) => p.soldout).length} épuisés`;
   $("#alist").innerHTML = rows.map((p) => `
     <div class="bg-white border border-ink/10 flex flex-col ${p.hidden ? "opacity-60" : ""}">
       <button data-edit="${p.id}" class="relative aspect-[4/3] bg-bone overflow-hidden text-left">
         <img src="${p.img}" alt="" class="w-full h-full object-cover" loading="lazy">
-        <span class="absolute top-3 left-3 flex gap-2">${p.soldout ? '<span class="eyebrow bg-terra text-cowrie px-2 py-1 !text-[.55rem]">Épuisé</span>' : ""}${p.hidden ? '<span class="eyebrow bg-ink text-cowrie px-2 py-1 !text-[.55rem]">Masqué</span>' : ""}</span>
+        <span class="absolute top-3 left-3 flex gap-2">${p.soldout || p.stock === 0 ? '<span class="eyebrow bg-terra text-cowrie px-2 py-1 !text-[.55rem]">Épuisé</span>' : (p.stock != null && p.stock !== "" && p.stock <= 3) ? `<span class="eyebrow bg-ember text-ink px-2 py-1 !text-[.55rem]">Stock : ${p.stock}</span>` : ""}${p.hidden ? '<span class="eyebrow bg-ink text-cowrie px-2 py-1 !text-[.55rem]">Masqué</span>' : ""}</span>
       </button>
       <div class="p-5 flex-1 flex flex-col gap-3">
         <div><p class="eyebrow opacity-50 !text-[.58rem]">${CAT[p.cat] || p.cat}</p><h3 class="display text-2xl leading-tight">${esc(p.name)}</h3></div>
         <div class="flex items-center gap-3 mt-auto">
           <span class="field-label">Prix</span>
           <div class="flex items-center border-b border-ink/30"><span class="text-sm">${CONFIG.currency}</span><input type="number" min="0" value="${p.price}" data-price="${p.id}" class="w-20 bg-transparent py-1.5 pl-1 outline-none"></div>
-          <button data-edit="${p.id}" class="eyebrow ulink ml-auto">Modifier</button>
+          <button data-dup="${p.id}" class="eyebrow opacity-50 hover:opacity-100 ml-auto" title="Créer une copie">Dupliquer</button><button data-edit="${p.id}" class="eyebrow ulink">Modifier</button>
         </div>
       </div>
     </div>`).join("") || '<p class="opacity-60">Aucun article.</p>';
 }
-$("#q").oninput = drawList;
-$("#alist").addEventListener("click", (e) => { const b = e.target.closest("[data-edit]"); if (b) openForm(b.dataset.edit); });
+$("#q").oninput = drawList; ["#fcat", "#fstate", "#fsort"].forEach((x) => $(x).onchange = drawList);
+$("#alist").addEventListener("click", (e) => {
+  const d = e.target.closest("[data-dup]");
+  if (d) {
+    const p = list.find((x) => x.id === d.dataset.dup), c = JSON.parse(JSON.stringify(p));
+    c.id = p.id.replace(/-copie.*$/, "") + "-copie-" + Math.random().toString(36).slice(2, 5); c.name = p.name + " (copie)"; c.hidden = true; c.added = Date.now();
+    list.unshift(c); if (persist()) { drawList(); say("Copie créée (masquée) : modifiez-la puis rendez-la visible"); }
+    return;
+  }
+  const b = e.target.closest("[data-edit]"); if (b) openForm(b.dataset.edit);
+});
 $("#alist").addEventListener("change", (e) => {
   const i = e.target.closest("[data-price]"); if (!i) return;
   const p = list.find((x) => x.id === i.dataset.price); p.price = Math.max(0, +i.value || 0);
@@ -270,12 +311,13 @@ let cur = null, imgs = [];
 const f = () => $("#pform");
 function openForm(id) {
   cur = id ? list.find((p) => p.id === id) : null;
-  const p = cur || { name: "", price: "", cat: "bonnets", tag: "Nouveau", color: "", desc: "", details: [], sizes: null, gallery: [] };
+  $("[name=cat]").innerHTML = CATEGORIES.map((c) => `<option value="${c.id}">${esc(c.label)}</option>`).join("");
+  const p = cur || { name: "", price: "", cat: ($("#fcat").value || (CATEGORIES[0] || {}).id), tag: "Nouveau", color: "", desc: "", details: [], sizes: null, gallery: [] };
   $("#m-title").textContent = cur ? "Modifier l’article" : "Nouvel article";
   const F = f();
   F.pname.value = p.name; F.price.value = p.price; F.cat.value = p.cat; F.tag.value = p.tag || ""; F.color.value = p.color || "";
   F.sizes.value = (p.sizes || []).join(", "); F.desc.value = p.desc || ""; F.details.value = (p.details || []).join("\n");
-  F.soldout.checked = !!p.soldout; F.ishidden.checked = !!p.hidden;
+  F.stock.value = (p.stock == null || p.stock === "") ? "" : p.stock; F.soldout.checked = !!p.soldout; F.ishidden.checked = !!p.hidden;
   imgs = [...(p.gallery || [])]; drawImgs();
   $("#m-del").classList.toggle("hidden", !cur);
   $("#modal").classList.remove("hidden"); document.body.style.overflow = "hidden";
@@ -322,9 +364,9 @@ f().onsubmit = (e) => {
   const data = {
     name: F.pname.value.trim(), price: Math.max(0, +F.price.value || 0), cat: F.cat.value, tag: F.tag.value.trim() || "Nouveau",
     color: F.color.value.trim(), desc: F.desc.value.trim(), details: F.details.value.split("\n").map((s) => s.trim()).filter(Boolean),
-    sizes: sizes.length ? sizes : undefined, img: imgs[0], gallery: [...imgs], soldout: F.soldout.checked || undefined, hidden: F.ishidden.checked || undefined
+    sizes: sizes.length ? sizes : undefined, stock: F.stock.value === "" ? undefined : Math.max(0, parseInt(F.stock.value, 10) || 0), img: imgs[0], gallery: [...imgs], soldout: F.soldout.checked || undefined, hidden: F.ishidden.checked || undefined
   };
-  if (cur) Object.assign(cur, data, { sizes: data.sizes, soldout: data.soldout, hidden: data.hidden });
+  if (cur) Object.assign(cur, data, { sizes: data.sizes, soldout: data.soldout, hidden: data.hidden, stock: data.stock });
   else {
     const slug = data.name.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "article";
     list.unshift({ id: slug + "-" + Math.random().toString(36).slice(2, 6), ...data, added: Date.now() });
@@ -336,6 +378,96 @@ $("#m-del").onclick = () => {
   if (!cur || !confirm(`Supprimer « ${cur.name} » définitivement ?`)) return;
   list = list.filter((p) => p !== cur); persist(); closeForm(); drawList(); say("Article supprimé");
 };
+
+/* ---------- Catégories ---------- */
+function persistCats() {
+  try { localStorage.setItem("impano_categories", JSON.stringify(CATEGORIES)); } catch (e) { alert("Stockage plein : photo trop lourde."); return false; }
+  refreshCat(); fillFilters(); markDirty(); return true;
+}
+const slug = (t) => t.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+function drawCats() {
+  $("#catlist").innerHTML = CATEGORIES.map((c, i) => {
+    const n = list.filter((p) => p.cat === c.id).length;
+    return `<div class="bg-white border border-ink/10 p-5 flex gap-5" data-cat="${i}">
+      <label class="relative w-28 shrink-0 aspect-[3/4] bg-bone overflow-hidden cursor-pointer group" title="Changer la photo"><img src="${esc(c.img)}" alt="" class="w-full h-full object-cover"><span class="absolute inset-x-0 bottom-0 bg-ink/80 text-cowrie text-[.55rem] tracking-widest uppercase text-center py-1.5 opacity-0 group-hover:opacity-100">Changer</span><input type="file" accept="image/*" data-ccimg="${i}" class="hidden"></label>
+      <div class="flex-1 min-w-0 space-y-4">
+        <label class="block"><span class="field-label">Nom complet</span><input data-cc="label" value="${esc(c.label)}" class="field"></label>
+        <label class="block"><span class="field-label">Nom court (menu, filtres)</span><input data-cc="short" value="${esc(c.short || "")}" class="field"></label>
+        <label class="block"><span class="field-label">Description</span><textarea data-cc="blurb" rows="2" class="field resize-none">${esc(c.blurb || "")}</textarea></label>
+        <div class="flex items-center justify-between pt-1 text-xs">
+          <span class="opacity-60">${n} article${n > 1 ? "s" : ""} · adresse <code>/boutique/${esc(c.id)}</code></span>
+          <span class="flex gap-4 eyebrow !text-[.58rem]"><button data-cmv="-1" ${i === 0 ? "disabled class='opacity-25'" : ""}>↑</button><button data-cmv="1" ${i === CATEGORIES.length - 1 ? "disabled class='opacity-25'" : ""}>↓</button><button data-cdel class="text-terra">Supprimer</button></span>
+        </div>
+      </div></div>`;
+  }).join("");
+}
+$("#catlist").addEventListener("change", async (e) => {
+  const card = e.target.closest("[data-cat]"); if (!card) return; const c = CATEGORIES[+card.dataset.cat];
+  if (e.target.dataset.cc) {
+    if (e.target.dataset.cc === "label" && !e.target.value.trim()) { e.target.value = c.label; return; }
+    c[e.target.dataset.cc] = e.target.value.trim(); if (!c.short) c.short = c.label;
+    if (persistCats()) say("Catégorie enregistrée ✦");
+  }
+  if (e.target.dataset.ccimg !== undefined && e.target.files[0]) {
+    try { c.img = await shrink(e.target.files[0], 1100, 0.85); if (persistCats()) { drawCats(); say("Photo mise à jour ✦"); } } catch (er) { alert("Image illisible."); }
+  }
+});
+$("#catlist").addEventListener("click", (e) => {
+  const card = e.target.closest("[data-cat]"); if (!card) return; const i = +card.dataset.cat, c = CATEGORIES[i];
+  const mv = e.target.closest("[data-cmv]");
+  if (mv) { const j = i + +mv.dataset.cmv; if (j < 0 || j >= CATEGORIES.length) return; [CATEGORIES[i], CATEGORIES[j]] = [CATEGORIES[j], CATEGORIES[i]]; if (persistCats()) drawCats(); return; }
+  if (e.target.closest("[data-cdel]")) {
+    if (CATEGORIES.length < 2) return alert("Il faut garder au moins une catégorie.");
+    const n = list.filter((p) => p.cat === c.id).length, dest = CATEGORIES.find((x) => x !== c);
+    if (!confirm(n ? `Supprimer « ${c.label} » ?\n${n} article(s) seront déplacés vers « ${dest.label} ».` : `Supprimer « ${c.label} » ?`)) return;
+    list.forEach((p) => { if (p.cat === c.id) p.cat = dest.id; }); CATEGORIES.splice(i, 1);
+    persist(); if (persistCats()) { drawCats(); say("Catégorie supprimée"); }
+  }
+});
+$("#cat-add").onclick = () => {
+  const name = (prompt("Nom de la nouvelle catégorie (ex. Bijoux, Écharpes, Enfants) :") || "").trim(); if (!name) return;
+  let id = slug(name) || "categorie", k = 2; while (CATEGORIES.some((c) => c.id === id)) id = slug(name) + "-" + k++;
+  CATEGORIES.push({ id, label: name, short: name, img: "icons/icon-512.png", blurb: "Nouvelle collection faite main." });
+  if (persistCats()) { drawCats(); say("Catégorie créée : ajoutez-lui une photo et une description ✦"); }
+};
+
+/* ---------- Tableau de bord ---------- */
+async function drawDash() {
+  const cur = CONFIG.currency, paid = ["payé", "expédié", "livré"], pending = ["nouveau", "confirmé"];
+  const os = ORDERS || [], live = os.filter((o) => o.status !== "annulé");
+  const sum = (a) => a.reduce((n, o) => n + (+o.total || 0), 0), m0 = new Date(); m0.setDate(1); m0.setHours(0, 0, 0, 0);
+  const sold = list.filter((p) => p.soldout || p.stock === 0), hid = list.filter((p) => p.hidden), low = list.filter((p) => p.stock != null && p.stock !== "" && p.stock > 0 && p.stock <= 3);
+  const noPhoto = list.filter((p) => !p.img), noDesc = list.filter((p) => !(p.desc || "").trim());
+  const emptyCats = CATEGORIES.filter((c) => !list.some((p) => p.cat === c.id && !p.hidden));
+  const kpi = (l, v, sub, tone) => `<div class="bg-white border border-ink/10 p-5"><p class="eyebrow !text-[.58rem] opacity-55">${l}</p><p class="display text-4xl mt-2 ${tone || ""}">${v}</p><p class="text-xs opacity-55 mt-1">${sub || ""}</p></div>`;
+  $("#kpis").innerHTML =
+    kpi("Nouvelles commandes", os.filter((o) => o.status === "nouveau").length, "à traiter", "text-terra") +
+    kpi("Chiffre d’affaires encaissé", cur + sum(os.filter((o) => paid.includes(o.status))), `${cur}${sum(os.filter((o) => pending.includes(o.status)))} en attente`) +
+    kpi("Commandes ce mois-ci", live.filter((o) => new Date(o.created_at) >= m0).length, `${live.length} au total`) +
+    kpi("Articles en ligne", list.length - hid.length, `${hid.length} masqué(s) · ${sold.length} épuisé(s)`);
+  const todo = [];
+  const t = (n, txt, go, icon) => { if (n) todo.push(`<button data-go="${go}" class="w-full text-left bg-white border border-ink/10 hover:border-ink/40 px-4 py-3 flex items-center gap-3 transition"><span class="text-lg">${icon}</span><span class="flex-1 text-sm">${txt}</span><span class="eyebrow ulink !text-[.58rem]">Voir</span></button>`); };
+  t(os.filter((o) => o.status === "nouveau").length, `<b>${os.filter((o) => o.status === "nouveau").length}</b> nouvelle(s) commande(s) à confirmer`, "orders", "🛍");
+  t(low.length, `<b>${low.length}</b> article(s) bientôt en rupture (stock ≤ 3)`, "low", "⚠");
+  t(sold.length, `<b>${sold.length}</b> article(s) épuisé(s) : réapprovisionner ou masquer`, "soldout", "✕");
+  t(noDesc.length, `<b>${noDesc.length}</b> article(s) sans description`, "nodesc", "✎");
+  t(noPhoto.length, `<b>${noPhoto.length}</b> article(s) sans photo`, "nophoto", "▣");
+  t(emptyCats.length, `<b>${emptyCats.length}</b> catégorie(s) sans article visible : ${emptyCats.map((c) => esc(c.short || c.label)).join(", ")}`, "cats", "▤");
+  if (!CONFIG.whatsapp) todo.push('<button data-go="settings" class="w-full text-left bg-white border border-terra px-4 py-3 text-sm">Numéro WhatsApp manquant : les clients ne pourront pas commander.</button>');
+  $("#todo").innerHTML = todo.join("") || '<p class="text-sm opacity-60 bg-white border border-ink/10 px-4 py-3">Tout est en ordre ✦</p>';
+  const cnt = {}; live.forEach((o) => (o.items || []).forEach((i) => { const k = i.name || i.id; cnt[k] = (cnt[k] || 0) + (+i.qty || 1); }));
+  const top = Object.entries(cnt).sort((a, b) => b[1] - a[1]).slice(0, 6), mx = top.length ? top[0][1] : 1;
+  $("#top").innerHTML = top.map(([n, q]) => `<div><div class="flex justify-between"><span class="truncate pr-3">${esc(n)}</span><span class="opacity-60">${q}</span></div><div class="h-1 bg-ink/10 mt-1"><div class="h-1 bg-terra" style="width:${(q / mx) * 100}%"></div></div></div>`).join("") || '<p class="opacity-55">Pas encore de commandes.</p>';
+  const mc = Math.max(1, ...CATEGORIES.map((c) => list.filter((p) => p.cat === c.id).length));
+  $("#bycat").innerHTML = CATEGORIES.map((c) => { const n = list.filter((p) => p.cat === c.id).length; return `<div><div class="flex justify-between"><span>${esc(c.short || c.label)}</span><span class="opacity-60">${n}</span></div><div class="h-1 bg-ink/10 mt-1"><div class="h-1 bg-ink" style="width:${(n / mc) * 100}%"></div></div></div>`; }).join("");
+  $("#recent").innerHTML = os.slice(0, 5).map((o) => `<div class="flex justify-between border-b border-ink/10 pb-2"><span><b class="font-medium">${esc(o.ref)}</b><br><span class="opacity-55 text-xs">${esc((o.client || {}).prenom || "")} · ${o.status || ""}</span></span><span>${cur}${o.total}</span></div>`).join("") || '<p class="opacity-55">Aucune commande.</p>';
+}
+$("#todo").addEventListener("click", (e) => {
+  const b = e.target.closest("[data-go]"); if (!b) return; const g = b.dataset.go;
+  if (["orders", "cats", "settings"].includes(g)) return $(`.tab[data-t="${g}"]`).click();
+  $(`.tab[data-t="articles"]`).click(); $("#fstate").value = g; drawList();
+});
+$("#dash-refresh").onclick = async () => { await drawOrders(); drawDash(); say("Actualisé"); };
 
 /* ---------- Commandes ---------- */
 const STATUSES = ["nouveau", "confirmé", "payé", "expédié", "livré", "annulé"];
@@ -375,6 +507,13 @@ $("#olist").addEventListener("click", async (e) => {
   const { error } = await sb.from("orders").delete().eq("id", d.dataset.odel);
   if (error) alert("Erreur : " + error.message); else { say("Commande supprimée"); drawOrders(); }
 });
+$("#oexport").onclick = () => {
+  const q = (v) => '"' + String(v ?? "").replace(/"/g, '""') + '"';
+  const rows = [["Référence", "Date", "Statut", "Prénom", "Nom", "Téléphone", "Email", "Adresse", "Articles", "Livraison", "Total", "Mode de livraison", "Paiement", "Note"]];
+  ORDERS.forEach((o) => { const c = o.client || {}; rows.push([o.ref, new Date(o.created_at).toLocaleString("fr-FR"), o.status || "", c.prenom, c.nom, c.tel, c.email, c.adresse, (o.items || []).map((i) => `${i.qty} x ${i.name || i.id}${i.size ? " (" + i.size + ")" : ""}`).join(" | "), o.shipping, o.total, o.delivery, o.payment, o.note]); });
+  const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob(["\ufeff" + rows.map((r) => r.map(q).join(";")).join("\n")], { type: "text/csv;charset=utf-8" }));
+  a.download = "commandes-impano-" + new Date().toISOString().slice(0, 10) + ".csv"; a.click(); say("Export téléchargé ✦");
+};
 $("#orefresh").onclick = () => { drawOrders(); say("Actualisé"); };
 setInterval(() => { if (window.sb && !$("#t-orders").classList.contains("hidden") && !document.hidden) drawOrders(); }, 60000);
 
@@ -446,8 +585,8 @@ async function syncRemote() {
   const { data } = await sb.from("site_data").select("key,value,updated_at"); if (!data || !data.length) return;
   const o = {}; let up = ""; data.forEach((r) => { o[r.key] = r.value; if (r.updated_at > up) up = r.updated_at; });
   if (up > (localStorage.getItem("impano_base") || "")) {
-    localStorage.setItem("impano_remote", JSON.stringify({ products: o.products, content: o.content, config: o.config, updated: up }));
-    ["impano_products", "impano_content", "impano_config"].forEach((k) => localStorage.removeItem(k));
+    localStorage.setItem("impano_remote", JSON.stringify({ products: o.products, categories: o.categories, content: o.content, config: o.config, updated: up }));
+    ["impano_products", "impano_content", "impano_config", "impano_categories"].forEach((k) => localStorage.removeItem(k));
     localStorage.setItem("impano_base", up); sessionStorage.setItem("impano_synced", "1"); location.reload();
   }
 }
@@ -592,13 +731,14 @@ async function publishSB(L) {
   const prods = JSON.parse(JSON.stringify(list));
   for (const p of prods) { p.img = await up(p.img); for (let i = 0; i < (p.gallery || []).length; i++) p.gallery[i] = await up(p.gallery[i]); }
   const cont = { ...content }; for (const k of Object.keys(cont)) cont[k] = await up(cont[k]);
+  const cats = JSON.parse(JSON.stringify(CATEGORIES)); for (const c of cats) c.img = await up(c.img);
   const cfg = JSON.parse(localStorage.getItem("impano_config") || "null");
-  const now = new Date().toISOString(), rows = [{ key: "products", value: prods, updated_at: now }, { key: "content", value: cont, updated_at: now }];
+  const now = new Date().toISOString(), rows = [{ key: "products", value: prods, updated_at: now }, { key: "categories", value: cats, updated_at: now }, { key: "content", value: cont, updated_at: now }];
   if (cfg) rows.push({ key: "config", value: cfg, updated_at: now });
   L("↑ base de données"); const { error } = await sb.from("site_data").upsert(rows);
   if (error) throw new Error("Base : " + error.message);
-  list = prods; content = cont; persist(); saveContent();
-  localStorage.setItem("impano_remote", JSON.stringify({ products: prods, content: cont, config: cfg || undefined, updated: now }));
+  list = prods; content = cont; CATEGORIES.splice(0, CATEGORIES.length, ...cats); persist(); saveContent(); localStorage.setItem("impano_categories", JSON.stringify(cats)); refreshCat();
+  localStorage.setItem("impano_remote", JSON.stringify({ products: prods, categories: cats, content: cont, config: cfg || undefined, updated: now }));
   localStorage.setItem("impano_base", now); localStorage.removeItem("impano_dirty");
   L("\n✔ Publié : visible immédiatement par tous vos clients.");
 }

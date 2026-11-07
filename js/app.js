@@ -102,13 +102,7 @@
     <symbol id="arrow" viewBox="0 0 24 12"><path d="M0 6h22M17 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.2"/></symbol>
   </defs></svg>`;
 
-  const NAV = [
-    ["boutique", "Boutique"],
-    ["boutique/bonnets", "Bonnets"],
-    ["boutique/sacs", "Sacs"],
-    ["boutique/pret-a-porter", "Prêt-à-porter"],
-    ["histoire", "La Maison"]
-  ];
+  const NAV = [["boutique", "Boutique"], ...CATEGORIES.map((c) => ["boutique/" + c.id, c.short || c.label]), ["histoire", "La Maison"]];
 
   function chrome() {
     const onHero = document.body.hasAttribute("data-hero");
@@ -120,11 +114,11 @@
     <header id="header" class="${onHero ? "on-hero " : "solid "}fixed top-[34px] inset-x-0 z-50 border-b border-transparent">
       <div class="max-w-[1500px] mx-auto px-4 md:px-10 h-20 relative flex items-center justify-between gap-4 whitespace-nowrap">
         <nav class="hidden xl:flex gap-7 2xl:gap-9 eyebrow">
-          ${NAV.map(([h, l], i) => `<a href="${h}" class="ulink ${i === 4 ? "hidden 2xl:inline " : ""}${cur === h ? "active" : ""}">${l}</a>`).join("")}
+          ${NAV.map(([h, l], i) => (i < 4 || i === NAV.length - 1) ? `<a href="${h}" class="ulink ${i === NAV.length - 1 ? "hidden 2xl:inline " : ""}${cur === h ? "active" : ""}">${l}</a>` : "").join("")}
         </nav>
         <button id="burger" class="xl:hidden w-10 h-10 -ml-2 grid place-items-center eyebrow" aria-label="Menu"><span class="block w-6 h-px bg-current relative before:absolute before:-top-1.5 before:w-6 before:h-px before:bg-current after:absolute after:top-1.5 after:w-4 after:h-px after:bg-current"></span></button>
         <a href="./" class="hlogo absolute left-1/2 -translate-x-1/2 text-center leading-none" aria-label="Impano — accueil">
-          <span class="logo text-[1.75rem] sm:text-[2.1rem] md:text-[2.6rem] block">impano</span>
+          <span class="logo-img w-[6.75rem] sm:w-[8.5rem] md:w-[10.5rem] mx-auto" role="img" aria-label="Impano"></span>
           <span class="logo-tag block text-[.45rem] mt-1.5 opacity-70">Wear the gift · Be the gift</span>
         </a>
         <div class="flex items-center gap-3 sm:gap-5 eyebrow ml-auto">
@@ -178,12 +172,12 @@
       <div class="max-w-[1500px] mx-auto px-5 md:px-10 pt-24 pb-10">
         <div class="grid lg:grid-cols-12 gap-14">
           <div class="lg:col-span-5">
-            <div class="logo-foot-wrap"><p class="logo logo-foot">impano</p></div>
+            <div class="logo-foot-wrap"><p class="logo-img logo-foot" role="img" aria-label="Impano"></p></div>
             <p class="logo-tag text-xs mt-8 opacity-60" data-cms="global.footer.tag">Wear the gift<br>Be the gift</p>
             <p class="mt-8 max-w-sm opacity-70 leading-relaxed" data-cms="global.footer.blurb">« Impano » signifie <em>le don</em>. Chaque fil que nous nouons est un cadeau — pour celui qui le crée, pour celui qui le porte.</p>
           </div>
           <div class="lg:col-span-2 lg:col-start-7"><p class="eyebrow opacity-50 mb-6">Boutique</p><ul class="space-y-3 text-sm">
-            <li><a class="ulink" href="boutique/bonnets">Bonnets & Chapeaux</a></li><li><a class="ulink" href="boutique/sacs">Sacs bananes</a></li><li><a class="ulink" href="boutique/pret-a-porter">Prêt-à-porter</a></li><li><a class="ulink" href="boutique">Tout voir</a></li></ul></div>
+            ${CATEGORIES.map((c) => `<li><a class="ulink" href="boutique/${c.id}">${c.label}</a></li>`).join("")}<li><a class="ulink" href="boutique">Tout voir</a></li></ul></div>
           <div class="lg:col-span-2"><p class="eyebrow opacity-50 mb-6">Maison</p><ul class="space-y-3 text-sm">
             <li><a class="ulink" href="histoire">Notre histoire</a></li><li><a class="ulink" href="histoire#cauris">Le langage des cauris</a></li><li><a class="ulink" href="histoire#atelier">L’atelier</a></li><li><a class="ulink" href="commande">Ma commande</a></li><li><a class="ulink" href="admin">Espace admin</a></li></ul></div>
           <div class="lg:col-span-2"><p class="eyebrow opacity-50 mb-6">Service</p><ul class="space-y-3 text-sm opacity-90">
@@ -446,7 +440,7 @@
       if (error || !data || !data.length) return;
       const o = {}; let up = "";
       data.forEach((r) => { o[r.key] = r.value; if (r.updated_at > up) up = r.updated_at; });
-      const next = JSON.stringify({ products: o.products, content: o.content, config: o.config, updated: up });
+      const next = JSON.stringify({ products: o.products, categories: o.categories, content: o.content, config: o.config, updated: up });
       if (next !== localStorage.getItem("impano_remote")) {
         localStorage.setItem("impano_remote", next);
         if (!sessionStorage.getItem("impano_rl")) { sessionStorage.setItem("impano_rl", "1"); location.reload(); }   // une seule fois par visite
