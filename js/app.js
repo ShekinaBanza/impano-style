@@ -444,7 +444,7 @@
       const next = JSON.stringify({ products: o.products, categories: o.categories, content: o.content, config: o.config, updated: up });
       if (next !== localStorage.getItem("impano_remote")) {
         localStorage.setItem("impano_remote", next);
-        if (!sessionStorage.getItem("impano_rl")) { sessionStorage.setItem("impano_rl", "1"); location.reload(); }   // une seule fois par visite
+        if (sessionStorage.getItem("impano_rl") !== up) { sessionStorage.setItem("impano_rl", up); location.reload(); }   // une fois par nouvelle version de la base
       }
     } catch (e) { /* hors-ligne : on garde la copie locale */ }
   }

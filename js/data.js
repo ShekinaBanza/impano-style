@@ -221,13 +221,14 @@ const DEFAULT_PRODUCTS = [
 (function () {
   const read = (k) => { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } };
   const SITE = window.SITE || {};
+  const draft = (k) => (window.sb && !localStorage.getItem("impano_dirty")) ? null : read(k);   // avec le serveur, seul un brouillon non publié prime sur la base
   const REMOTE = read("impano_remote") || {};            // dernière copie reçue de le serveur
-  const cfg = read("impano_config") || REMOTE.config || SITE.config;
+  const cfg = draft("impano_config") || REMOTE.config || SITE.config;
   if (cfg) Object.assign(CONFIG, cfg, { shipping: Object.assign({}, CONFIG.shipping, cfg.shipping || {}) });
   window.DEFAULT_PRODUCTS = DEFAULT_PRODUCTS;
-  const storedCats = read("impano_categories") || REMOTE.categories || SITE.categories;
+  const storedCats = draft("impano_categories") || REMOTE.categories || SITE.categories;
   window.CATEGORIES = JSON.parse(JSON.stringify(storedCats || window.DEFAULT_CATEGORIES));
-  window.ALL_PRODUCTS = read("impano_products") || REMOTE.products || SITE.products || DEFAULT_PRODUCTS;   // tout (pour l'admin)
+  window.ALL_PRODUCTS = draft("impano_products") || REMOTE.products || SITE.products || DEFAULT_PRODUCTS;   // tout (pour l'admin)
   /* Un article dont la catégorie n'existe plus (ex. supprimée par erreur) la fait réapparaître au lieu d'être invisible */
   window.ALL_PRODUCTS.forEach((p) => {
     if (p.cat && !window.CATEGORIES.some((c) => c.id === p.cat)) {
@@ -236,7 +237,7 @@ const DEFAULT_PRODUCTS = [
     }
   });
   window.PRODUCTS = window.ALL_PRODUCTS.filter((p) => !p.hidden).map((p) => (p.stock === 0 || p.stock === "0") ? Object.assign({}, p, { soldout: true }) : p);                       // visible en boutique
-  window.CONTENT = read("impano_content") || REMOTE.content || SITE.content || {};                        // textes, images, vidéos
+  window.CONTENT = draft("impano_content") || REMOTE.content || SITE.content || {};                        // textes, images, vidéos
   // Catégories éditables
   if (!storedCats) CATEGORIES.forEach((c) => {   // anciennes modifications de textes (avant la gestion des catégories)
     ["label", "short", "blurb", "img"].forEach((f) => { const v = CONTENT[`cat.${c.id}.${f}`]; if (v) c[f] = v; });
