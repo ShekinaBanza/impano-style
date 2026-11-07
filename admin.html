@@ -838,14 +838,9 @@ async function publishSB(L) {
 $("#diag").onclick = async () => {
   try {
     const r = await fetch((window.ROOT || "/") + "api/index.php?r=ping&t=" + Date.now(), { credentials: "same-origin", headers: { "X-Impano": "1" } }), t = await r.text();
-    let j; try { j = JSON.parse(t); } catch (e) { return alert("Le serveur n’a pas renvoyé de JSON (HTTP " + r.status + ").
-" + t.slice(0, 300)); }
-    if (j.error || !j.version) return alert("API ANCIENNE : renvoyez api/index.php depuis le ZIP.
-" + (j.error || ""));
-    alert("API version " + j.version + " · PHP " + j.php + "
-Écriture base : " + (j.ecriture ? "OK" : "IMPOSSIBLE") + "
-Connecté admin : " + (j.admin ? "oui" : "NON") + "
-Données : " + Object.entries(j.cles).map(([k, v]) => k + " (" + v.octets + " o, " + v.maj + ")").join(" ; "));
+    let j; try { j = JSON.parse(t); } catch (e) { return alert("Le serveur n’a pas renvoyé de JSON (HTTP " + r.status + ").\n" + t.slice(0, 300)); }
+    if (j.error || !j.version) return alert("API ANCIENNE : renvoyez api/index.php depuis le ZIP.\n" + (j.error || ""));
+    alert("API version " + j.version + " · PHP " + j.php + "\nÉcriture base : " + (j.ecriture ? "OK" : "IMPOSSIBLE") + "\nConnecté admin : " + (j.admin ? "oui" : "NON") + "\nDonnées : " + Object.entries(j.cles).map(([k, v]) => k + " (" + v.octets + " o, " + v.maj + ")").join(" ; "));
   } catch (e) { alert("Serveur injoignable : " + e.message); }
 };
 $("#pub-go").onclick = async () => {

@@ -1,5 +1,5 @@
 /* Impano — service worker : adresses propres + mode hors-ligne pour les pages et images vues */
-const VERSION = "impano-v25";
+const VERSION = "impano-v26";
 const ROOT = new URL("./", self.registration.scope).pathname;           // ex. /impano-style/
 const CORE = ["./", "index.html", "boutique.html", "produit.html", "commande.html", "histoire.html", "admin.html",
   "css/style.css", "js/app.js", "js/data.js", "js/config.js", "js/sb.js", "js/tw-config.js", "data/site.js", "manifest.webmanifest",
@@ -34,14 +34,14 @@ self.addEventListener("fetch", (e) => {
     if (f) {
       const key = new Request(ROOT + f);
       e.respondWith(fetch(key, { cache: "no-cache" }).then((r) => {
-        if (r.ok) { caches.open(VERSION).then((c) => c.put(key, r.clone())); return r; }
+        if (r.ok) { const cp = r.clone(); caches.open(VERSION).then((c) => c.put(key, cp)); return r; }
         return fetch(req);                                                   // inconnue : laisser 404.html faire sa redirection
       }).catch(() => caches.match(key).then((r) => r || caches.match(ROOT + "index.html"))));
       return;
     }
   }
   if (sameOrigin && /\.(js|css|html|webmanifest)$/.test(url.pathname)) {   // code : réseau d'abord
-    e.respondWith(fetch(req.url, { cache: "no-cache" }).then((r) => { caches.open(VERSION).then((c) => c.put(req, r.clone())); return r; })
+    e.respondWith(fetch(req.url, { cache: "no-cache" }).then((r) => { if (r.ok) { const cp = r.clone(); caches.open(VERSION).then((c) => c.put(req, cp)); } return r; })
       .catch(() => caches.match(req)));
     return;
   }
