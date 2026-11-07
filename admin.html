@@ -114,7 +114,7 @@
 
     <!-- Catégories -->
     <section id="t-cats" class="hidden">
-      <div class="flex flex-wrap items-end justify-between gap-4 mb-8"><div><h1 class="display text-5xl italic">Catégories</h1><p class="text-sm opacity-60 mt-1 max-w-xl">Créez, renommez, réordonnez vos catégories. Elles apparaissent automatiquement dans le menu, la boutique, l’accueil et la recherche.</p></div><button id="cat-add" class="btn btn-ink !py-3">+ Nouvelle catégorie</button></div>
+      <div class="flex flex-wrap items-end justify-between gap-4 mb-8"><div><h1 class="display text-5xl italic">Catégories</h1><p class="text-sm opacity-60 mt-1 max-w-xl">Créez, renommez, réordonnez vos catégories. Elles apparaissent automatiquement dans le menu, la boutique, l’accueil et la recherche.</p></div><form id="cat-form" class="flex flex-wrap gap-2 w-full sm:w-auto"><input id="cat-name" class="field flex-1 min-w-[12rem]" placeholder="Nom de la catégorie (ex. Bijoux)" maxlength="40" autocomplete="off" required><button id="cat-add" type="submit" class="btn btn-ink !py-3">+ Ajouter</button></form></div>
       <div id="catlist" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
     </section>
 
@@ -506,12 +506,14 @@ $("#catlist").addEventListener("click", (e) => {
     persist(); if (persistCats()) { drawCats(); say("Catégorie supprimée"); }
   }
 });
-$("#cat-add").onclick = () => {
-  const name = (prompt("Nom de la nouvelle catégorie (ex. Bijoux, Écharpes, Enfants) :") || "").trim(); if (!name) return;
+$("#cat-form").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const inp = $("#cat-name"), name = inp.value.trim(); if (!name) return inp.focus();
   let id = slug(name) || "categorie", k = 2; while (CATEGORIES.some((c) => c.id === id)) id = slug(name) + "-" + k++;
   CATEGORIES.push({ id, label: name, short: name, img: "icons/icon-512.png", blurb: "Nouvelle collection faite main." });
+  inp.value = "";
   if (persistCats()) { drawCats(); say("Catégorie créée : ajoutez-lui une photo et une description ✦"); }
-};
+});
 
 /* ---------- Tableau de bord ---------- */
 async function drawDash() {
