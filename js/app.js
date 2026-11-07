@@ -197,7 +197,8 @@
       const y = scrollY;
       hdr.style.top = Math.max(0, 34 - y) + "px";
       hdr.classList.toggle("solid", y > 40 || !onHero);
-      hdr.classList.toggle("hide", y > 400 && y > last);
+      const hide = y > 400 && y > last; hdr.classList.toggle("hide", hide); document.body.classList.toggle("hdr-hide", hide);
+      const fb = document.querySelector(".fbar"); if (fb) fb.classList.toggle("stuck", fb.getBoundingClientRect().top <= (hide ? 1 : 82));
       last = y;
     };
     addEventListener("scroll", onScroll, { passive: true }); onScroll();

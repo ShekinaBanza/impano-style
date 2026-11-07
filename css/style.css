@@ -164,8 +164,10 @@ html.dark .bg-ink.text-cowrie, html.dark footer { border-top: 1px solid rgba(241
 html.dark img, html.dark video { filter: brightness(.94); }
 
 /* ================= BARRE DE FILTRES (boutique) ================= */
-.fbar { position: sticky; top: 4.25rem; z-index: 30; background: rgba(247,242,233,.94); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(21,17,14,.1); }
-.fbar-in { max-width: 1500px; margin: 0 auto; padding: .85rem 1.25rem; display: flex; flex-direction: column; gap: .75rem; }
+.fbar { position: sticky; top: 5rem; z-index: 30; background: #F7F2E9; border-bottom: 1px solid rgba(21,17,14,.1); transition: top .45s cubic-bezier(.7,0,.2,1), box-shadow .3s; }
+body.hdr-hide .fbar { top: 0; }
+.fbar.stuck { box-shadow: 0 6px 18px -12px rgba(21,17,14,.35); }
+.fbar-in { max-width: 1500px; margin: 0 auto; padding: .7rem 1.25rem; display: flex; flex-direction: column; gap: .6rem; }
 @media (min-width: 768px) { .fbar-in { padding: .9rem 2.5rem; flex-direction: row; align-items: center; justify-content: space-between; gap: 1.5rem; } }
 .chips { display: flex; gap: .5rem; overflow-x: auto; scrollbar-width: none; -webkit-mask-image: linear-gradient(90deg, #000 92%, transparent); mask-image: linear-gradient(90deg, #000 92%, transparent); padding-right: 1.5rem; }
 @media (min-width: 768px) { .chips { -webkit-mask-image: none; mask-image: none; padding-right: 0; } }
@@ -186,7 +188,7 @@ html.dark img, html.dark video { filter: brightness(.94); }
 .switch input:focus-visible + .tr { outline: 2px solid #B4521E; outline-offset: 2px; }
 .sortsel { appearance: none; -webkit-appearance: none; border: 1px solid rgba(21,17,14,.22); border-radius: 999px; height: 2.5rem; padding: 0 2.2rem 0 1rem; font-size: .66rem; letter-spacing: .14em; text-transform: uppercase; background: transparent url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none' stroke='%2315110E' stroke-width='1.4'%3E%3Cpath d='M1 1l4 4 4-4'/%3E%3C/svg%3E") no-repeat right .9rem center; cursor: pointer; }
 .fcount { font-size: .66rem; letter-spacing: .16em; text-transform: uppercase; opacity: .55; white-space: nowrap; }
-html.dark .fbar { background: rgba(20,16,13,.94); border-color: rgba(241,233,220,.12); }
+html.dark .fbar { background: #14100D; border-color: rgba(241,233,220,.12); }
 html.dark .chip, html.dark .sortsel { border-color: rgba(241,233,220,.25); }
 html.dark .chip:hover { border-color: #F1E9DC; }
 html.dark .chip.on { background: #F1E9DC; color: #14100D; border-color: #F1E9DC; }
