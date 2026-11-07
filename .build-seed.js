@@ -5,6 +5,7 @@ ctx.globalThis = ctx; vm.createContext(ctx);
 vm.runInContext("var window = this;", ctx); ctx.window = ctx; ctx.SITE = {};
 vm.runInContext(fs.readFileSync("js/data.js", "utf8") + "\n;this.__P = window.DEFAULT_PRODUCTS || DEFAULT_PRODUCTS; this.__C = window.CONFIG; this.__K = window.DEFAULT_CATEGORIES;", ctx);
 const P = ctx.__P, C = ctx.__C;
-fs.writeFileSync("api/seed.json", JSON.stringify({ products: P, categories: ctx.__K, config: C }));
+let old = {}; try { old = JSON.parse(fs.readFileSync("api/seed.json", "utf8")); } catch (e) {}
+fs.writeFileSync("api/seed.json", JSON.stringify({ products: P, categories: ctx.__K, content: old.content, config: C }));
 console.log(P.length, "articles;", JSON.stringify(C));
 console.log("sans description:", P.filter((p) => !p.desc).length, "| sans détails:", P.filter((p) => !p.details || !p.details.length).length, "| sans prix:", P.filter((p) => !p.price).length);
