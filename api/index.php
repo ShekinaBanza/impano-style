@@ -17,7 +17,7 @@ $c = $cfg['db'] ?? null;
 if (!is_array($c) || empty($c['name']) || empty($c['user'])) fail('MySQL non configuré : renseignez « db » (host, name, user, pass) dans api/config.php.', 500);
 try {
   $db = new PDO('mysql:host=' . ($c['host'] ?? 'localhost') . ';port=' . ($c['port'] ?? 3306) . ';dbname=' . $c['name'] . ';charset=utf8mb4', $c['user'], (string)($c['pass'] ?? ''), [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC, PDO::ATTR_EMULATE_PREPARES => false]);
-} catch (Throwable $e) { fail('Connexion MySQL impossible : vérifiez le nom, l’utilisateur et le mot de passe de la base dans api/config.php.', 500); }
+} catch (Throwable $e) { fail('Connexion MySQL impossible (' . preg_replace('/\s+/', ' ', $e->getMessage()) . ') — vérifiez host, name, user, pass dans api/config.php.', 500); }
 $T = ' ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci';
 foreach ([
   "CREATE TABLE IF NOT EXISTS users(id INT AUTO_INCREMENT PRIMARY KEY, email VARCHAR(190) NOT NULL UNIQUE, name VARCHAR(120), phone VARCHAR(40), pass VARCHAR(255) NOT NULL, is_admin TINYINT NOT NULL DEFAULT 0, created_at VARCHAR(40) NOT NULL)$T",
