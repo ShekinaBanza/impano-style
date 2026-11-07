@@ -827,6 +827,9 @@ async function publishSB(L) {
   if (cfg) rows.push({ key: "config", value: cfg, updated_at: now });
   L("↑ base de données"); const { error } = await sb.from("site_data").upsert(rows);
   if (error) throw new Error("Base : " + error.message);
+  const chk = await sb.from("site_data").select("key,value,updated_at");
+  const got = ((chk.data || []).find((r) => r.key === "categories") || {}).value;
+  if (!got || JSON.stringify(got) !== JSON.stringify(cats)) throw new Error("les catégories n’ont pas été enregistrées dans la base — le fichier api/index.php sur le serveur est probablement ancien : renvoyez-le depuis le ZIP.");
   list = prods; content = cont; CATEGORIES.splice(0, CATEGORIES.length, ...cats); persist(); saveContent(); localStorage.setItem("impano_categories", JSON.stringify(cats)); refreshCat();
   localStorage.setItem("impano_remote", JSON.stringify({ products: prods, categories: cats, content: cont, config: cfg || undefined, updated: now }));
   localStorage.setItem("impano_base", now); localStorage.removeItem("impano_dirty");

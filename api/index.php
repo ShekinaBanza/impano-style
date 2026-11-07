@@ -33,7 +33,7 @@ if ((int)$db->query('SELECT COUNT(*) FROM users WHERE is_admin=1')->fetchColumn(
 }
 
 /* Catalogue d'origine : copié UNE SEULE FOIS dans la base (ensuite la base fait foi et l'admin modifie tout) */
-if ((int)$db->query("SELECT COUNT(*) FROM site_data WHERE key='products'")->fetchColumn() === 0 && is_file(__DIR__ . '/seed.json')) {
+if (is_file(__DIR__ . '/seed.json') && (int)$db->query("SELECT COUNT(*) FROM site_data WHERE key IN ('products','categories','config')")->fetchColumn() < 3) {
   $seed = json_decode((string)file_get_contents(__DIR__ . '/seed.json'), true);
   $ins = $db->prepare('INSERT OR IGNORE INTO site_data(key,value,updated_at) VALUES(?,?,?)');
   foreach (['products', 'categories', 'config'] as $k) if (!empty($seed[$k])) $ins->execute([$k, json_encode($seed[$k], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), gmdate('c')]);
@@ -146,8 +146,13 @@ switch ($route) {
   case 'publish':
     needAdmin($db); $rows = body()['rows'] ?? []; if (!is_array($rows) || !$rows) fail('Rien à enregistrer.');
     $st = $db->prepare('INSERT INTO site_data(key,value,updated_at) VALUES(?,?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value, updated_at=excluded.updated_at');
-    foreach ($rows as $r) { if (!in_array($r['key'] ?? '', ['products', 'categories', 'content', 'config'], true)) continue; $st->execute([$r['key'], json_encode($r['value'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), gmdate('c')]); }
-    out(['ok' => true]);
+    $saved = [];
+    foreach ($rows as $r) {
+      $k = $r['key'] ?? '';
+      if (!in_array($k, ['products', 'categories', 'content', 'config'], true)) fail('Clé inconnue : ' . $k);
+      $st->execute([$k, json_encode($r['value'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), gmdate('c')]); $saved[] = $k;
+    }
+    out(['ok' => true, 'saved' => $saved]);
 
   /* ----- Envoi de photos / vidéos (admin) ----- */
   case 'upload':
