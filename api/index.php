@@ -80,9 +80,13 @@ switch ($route) {
     foreach ($rows as &$r) $r['value'] = json_decode($r['value'], true);
     out($rows);
 
+  case 'categories':
+    $v = $db->query("SELECT value FROM site_data WHERE key='categories'")->fetchColumn();
+    out(['categories' => $v ? json_decode($v, true) : null]);
+
   case 'ping':
     $k = []; foreach ($db->query('SELECT key,updated_at,length(value) AS n FROM site_data')->fetchAll() as $r) $k[$r['key']] = ['maj' => $r['updated_at'], 'octets' => (int)$r['n']];
-    out(['version' => 25, 'php' => PHP_VERSION, 'cles' => $k, 'ecriture' => is_writable(__DIR__ . '/storage'), 'admin' => (bool)(($u = me($db)) && !empty($u['is_admin']))]);
+    out(['version' => 26, 'php' => PHP_VERSION, 'cles' => $k, 'ecriture' => is_writable(__DIR__ . '/storage'), 'admin' => (bool)(($u = me($db)) && !empty($u['is_admin']))]);
 
   /* ----- Comptes ----- */
   case 'me': $u = me($db); out(['user' => $u ? userOut($u) : null]);
